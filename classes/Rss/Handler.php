@@ -54,6 +54,10 @@ class Handler implements RequestHandlerInterface
 			return $response->withStatus(401);
 		}
 
+		if (!\ilObjUser::_lookupLogin($usrId)) {
+			return $response->withStatus(401);
+		}
+
 		$userHash = \ilObjUser::_lookupFeedHash($usrId);
 		if ($userHash !== $hash) {
 			return $response->withStatus(401);
