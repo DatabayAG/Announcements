@@ -12,14 +12,42 @@ class ilAnnouncementsUIHookGUI extends ilUIHookPluginGUI
 	/** @var Container */
 	protected $dic;
 
+	/** @var ilCtrl */
+	protected $ctrl;
+
+	/** @var ilObjUser */
+	protected $actor;
+
+	/** @var \ILIAS\DI\HTTPServices */
+	protected $http;
+
 	/**
-	 * ilKHFreiburgUIHookGUI constructor.
+	 * ilAnnouncementsUIHookGUI constructor.
 	 */
 	public function __construct()
 	{
 		global $DIC;
 
 		$this->dic = $DIC;
+
+		$this->http = $DIC->http();
+		$this->ctrl = $DIC->ctrl();
+		$this->actor = $DIC->user();
+	}
+
+	/**
+	 * 
+	 */
+	public function executeCommand()
+	{
+		if ($this->actor->isAnonymous() || 0 === (int) $this->actor->getId()) {
+			$target = '';
+			$entryId = (int) ($this->http->request()->getQueryParams()['entry_id'] ?? 0);
+			if ($entryId > 0) {
+				$target = '&target=announcements_' . $entryId;
+			}
+			$this->ctrl->redirectToURL('login.php?cmd=force_login&client_id=' . CLIENT_ID . $target);
+		}
 	}
 
 	/**
@@ -43,5 +71,29 @@ class ilAnnouncementsUIHookGUI extends ilUIHookPluginGUI
 		}
 
 		return $unmodified;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function checkGotoHook($a_target)
+	{
+		global $DIC;
+
+		$parts = explode('_', $a_target);
+		if ($parts[0] == 'announcements') {
+			$_GET['baseClass'] = ilUIPluginRouterGUI::class;
+			$DIC->ctrl()->setTargetScript('ilias.php');
+			// TODO: Permanent links should be created with ilLink::_getLink($entry->getId(), 'announcements')
+			if (isset($parts[1]) && is_numeric($parts[1])) {
+				$DIC->ctrl()->setParameterByClass(self::class, 'entry_id', $parts[1]);
+				$DIC->ctrl()->redirectByClass([
+					ilUIPluginRouterGUI::class, self::class],
+					'###A command for the detail view###' //TODO
+				);
+			}
+		}
+
+		return parent::checkGotoHook($a_target);
 	}
 }
