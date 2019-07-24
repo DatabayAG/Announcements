@@ -89,22 +89,8 @@ class Model extends \ActiveRecord
 
 	/**
 	 * @inheritDoc
-	 * @throws \ilException
 	 */
-	public function create()
-	{
-		$this->setCreatedTs(time());
-
-		parent::create();
-	}
-
-	/**
-	 * @inheritDoc
-	 * @throws \ilException
-	 */
-	public function update()
-	{
-		$this->setLastModifiedTs(time());
-		parent::update();
+	public static function returnDbTableName() {
+		return 'pl_announcements';
 	}
 }

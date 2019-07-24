@@ -62,8 +62,13 @@ class RoleBasedAccessHandler implements AccessHandler
 	 */
 	public function mayEditEntry(Model $entry) : bool
 	{
-		// TODO: Implement mayEditEntry() method.
-		return !$this->isActorAnonymous();
+		return (
+			!$this->isActorAnonymous() &&
+			(
+				(int) $this->actor->getId() === (int) $entry->getCreatorUsrId()
+				// TODO: Order Rolle darf
+			)
+		);
 	}
 
 	/**
@@ -71,8 +76,13 @@ class RoleBasedAccessHandler implements AccessHandler
 	 */
 	public function mayDeleteEntry(Model $entry) : bool
 	{
-		// TODO: Implement mayDeleteEntry() method.
-		return !$this->isActorAnonymous();
+		return (
+			!$this->isActorAnonymous() &&
+			(
+				(int) $this->actor->getId() === (int) $entry->getCreatorUsrId()
+				// TODO: Order Rolle darf
+			)
+		);
 	}
 
 	/**
@@ -81,6 +91,22 @@ class RoleBasedAccessHandler implements AccessHandler
 	public function mayMakeStickyEntries() : bool
 	{
 		// TODO: Implement mayMakeStickyEntries() method.
+		return !$this->isActorAnonymous();
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function mayReadExpiredEntries() : bool
+	{
+		return !$this->isActorAnonymous();
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function mayReadUnpublishedEntries() : bool
+	{
 		return !$this->isActorAnonymous();
 	}
 }

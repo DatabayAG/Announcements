@@ -32,4 +32,10 @@ interface AccessHandler
 
 	/** @return bool */
 	public function mayMakeStickyEntries() : bool;
+
+	/** @return bool */
+	public function mayReadExpiredEntries() : bool;
+
+	/** @return bool */
+	public function mayReadUnpublishedEntries() : bool;
 }

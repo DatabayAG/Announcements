@@ -3,6 +3,8 @@
 
 use ILIAS\DI\Container;
 use ILIAS\GlobalScreen\Scope\MainMenu\Provider\AbstractStaticPluginMainMenuProvider;
+use ILIAS\Plugin\Announcements\AccessControl\RoleBasedAccessHandler;
+use ILIAS\Plugin\Announcements\Entry\Service;
 
 /**
  * Class ilAnnouncementsPlugin
@@ -52,6 +54,20 @@ class ilAnnouncementsPlugin extends ilUserInterfaceHookPlugin
 
 		if (!self::$initialized) {
 			self::$initialized = true;
+
+			$GLOBALS['DIC']['plugin.announcements.accessHandler'] = function(Container $c) {
+				return new RoleBasedAccessHandler(
+					$c->user(),
+					$c->rbac()->review()
+				);
+			};
+
+			$GLOBALS['DIC']['plugin.announcements.service'] = function(Container $c) {
+				return new Service(
+					$c->user(),
+					$c['plugin.announcements.accessHandler']
+				);
+			};
 		}
 	}
 
