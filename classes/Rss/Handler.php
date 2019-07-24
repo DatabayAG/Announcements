@@ -63,8 +63,7 @@ class Handler implements RequestHandlerInterface
 			return $response->withStatus(401);
 		}
 
-		$actor = new \ilObjUser($usrId);
-		$this->service = $this->service->withActor($actor);
+		$this->service = $this->service->withActor(new \ilObjUser($usrId));
 
 		$rssTemplate = new \ilTemplate('tpl.rss_2_0.xml', true, true, 'Services/Feeds');
 		$rssTemplate->setVariable('XML', 'xml');
