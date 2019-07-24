@@ -18,20 +18,26 @@ class Service
 	/** @var AccessHandler */
 	private $accessHandler;
 
+	/** @var \ilDBInterface */
+	private $db;
+
 	/** @var \ilObjUser */
 	private $actor;
 
 	/**
 	 * Service constructor.
-	 * @param \ilObjUser    $actor
-	 * @param AccessHandler $accessHandler
+	 * @param \ilObjUser     $actor
+	 * @param \ilDBInterface $db
+	 * @param AccessHandler  $accessHandler
 	 */
 	public function __construct(
 		\ilObjUser $actor,
+		\ilDBInterface $db,
 		AccessHandler $accessHandler
 		
 	) {
 		$this->actor = $actor;
+		$this->db = $db;
 		$this->accessHandler = $accessHandler;
 	}
 
@@ -118,19 +124,28 @@ class Service
 			return [];
 		}
 
-		$where = $operators = [];
+		$effectiveCondition = [];
+		$runtimeConditions = [];
 
 		if (!$this->accessHandler->mayReadUnpublishedEntries()) {
-			$where['publish_ts'] = time();
-			$operators['publish_ts'] = '>=';
+			$runtimeConditions[] = '(' . implode(' OR ', [
+				'publish_ts >= ' . $this->db->quote(time(), 'integer'),
+				'creator_usr_id = ' . $this->db->quote($this->actor->getId(), 'integer'),
+			]) . ')';
 		}
 
 		if (!$this->accessHandler->mayReadExpiredEntries()) {
-			$where['expiration_ts'] = time();
-			$operators['expiration_ts'] = '<=';
+			$runtimeConditions[] = '(' . implode(' OR ', [
+				'expiration_ts <= ' . $this->db->quote(time(), 'integer'),
+				'creator_usr_id = ' . $this->db->quote($this->actor->getId(), 'integer'),
+			]) . ')';
+		}
+		
+		if (count($runtimeConditions) > 0) {
+			$effectiveCondition = implode(' AND ', $runtimeConditions); 
 		}
 
-		$list = Model::where($where, $operators)->orderBy('publish_ts', 'DESC');
+		$list = Model::where($effectiveCondition)->orderBy('publish_ts', 'DESC');
 
 		return $list->get();
 	}

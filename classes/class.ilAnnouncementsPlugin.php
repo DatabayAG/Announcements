@@ -65,6 +65,7 @@ class ilAnnouncementsPlugin extends ilUserInterfaceHookPlugin
 			$GLOBALS['DIC']['plugin.announcements.service'] = function(Container $c) {
 				return new Service(
 					$c->user(),
+					$c->database(),
 					$c['plugin.announcements.accessHandler']
 				);
 			};
