@@ -32,6 +32,18 @@ class RoleBasedAccessHandler implements AccessHandler
 	}
 
 	/**
+	 * @param \ilObjUser $actor
+	 * @return self
+	 */
+	public function withActor(\ilObjUser $actor) : AccessHandler
+	{
+		$clone = clone $this;
+		$clone->actor = $actor;
+
+		return $clone;
+	}
+
+	/**
 	 * @return bool
 	 */
 	private function isActorAnonymous() : bool

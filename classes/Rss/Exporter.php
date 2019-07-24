@@ -12,6 +12,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 /**
  * Class Exporter
  * @package ILIAS\Plugin\Announcements\Rss
+ * @author Michael Jansen <mjansen@databay.de>         
  */
 class Exporter implements RequestHandlerInterface
 {
@@ -55,6 +56,11 @@ class Exporter implements RequestHandlerInterface
 		$userHash = \ilObjUser::_lookupFeedHash($usrId);
 		if ($userHash !== $hash) {
 			return $response->withStatus(401);
+		}
+
+		$entries = $this->service->findAllValid();
+		foreach ($entries as $entry) {
+			// TODO: Write to RSS/XML
 		}
 
 		$response = $response->withStatus(200)->withHeader('Content-Type', 'text/xml; charset=UTF-8;');

@@ -42,6 +42,19 @@ class Service
 	}
 
 	/**
+	 * @param \ilObjUser $actor
+	 * @return Service
+	 */
+	public function withActor(\ilObjUser $actor) : self
+	{
+		$clone = clone $this;
+		$clone->actor = $actor;
+		$clone->accessHandler = $this->accessHandler->withActor($actor); 
+
+		return $clone;
+	}
+
+	/**
 	 * @param Model $entry
 	 * @throws PermissionDenied
 	 * @throws CommandLogic

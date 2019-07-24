@@ -12,6 +12,12 @@ use ILIAS\Plugin\Announcements\Entry\Model;
  */
 interface AccessHandler
 {
+	/**
+	 * @param \ilObjUser $actor
+	 * @return self
+	 */
+	public function withActor(\ilObjUser $actor) : self;
+
 	/** @return bool */
 	public function mayReadEntries() : bool;
 
