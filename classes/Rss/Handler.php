@@ -4,17 +4,18 @@
 namespace ILIAS\Plugin\Announcements\Rss;
 
 use ILIAS\DI\HTTPServices;
+use ILIAS\Filesystem\Stream\Streams;
 use ILIAS\Plugin\Announcements\Entry\Service;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 /**
- * Class Exporter
+ * Class Handler
  * @package ILIAS\Plugin\Announcements\Rss
  * @author Michael Jansen <mjansen@databay.de>         
  */
-class Exporter implements RequestHandlerInterface
+class Handler implements RequestHandlerInterface
 {
 	/** @var HTTPServices */
 	private $httpServices;
@@ -58,12 +59,22 @@ class Exporter implements RequestHandlerInterface
 			return $response->withStatus(401);
 		}
 
+		$actor = new \ilObjUser($usrId);
+		$this->service = $this->service->withActor($actor);
+
+		$body = "";
+
 		$entries = $this->service->findAllValid();
 		foreach ($entries as $entry) {
 			// TODO: Write to RSS/XML
 		}
 
-		$response = $response->withStatus(200)->withHeader('Content-Type', 'text/xml; charset=UTF-8;');
+		$response = $response
+			->withStatus(200)
+			->withHeader('Content-Type', 'text/xml; charset=UTF-8;')
+			->withBody($stream = Streams::ofString(
+				$body
+			));
 
 		return $response;
 	}

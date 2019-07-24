@@ -130,11 +130,12 @@ class Service
 	/**
 	 * @return Model[]
 	 * @throws \arException
+	 * @throws PermissionDenied
 	 */
 	public function findAllValid() : array
 	{
 		if (!$this->accessHandler->mayReadEntries()) {
-			return [];
+			throw new PermissionDenied('No permission to read entries!');
 		}
 
 		$effectiveCondition = [];
