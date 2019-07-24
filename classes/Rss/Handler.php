@@ -62,18 +62,44 @@ class Handler implements RequestHandlerInterface
 		$actor = new \ilObjUser($usrId);
 		$this->service = $this->service->withActor($actor);
 
-		$body = "";
+		$rssTemplate = new \ilTemplate('tpl.rss_2_0.xml', true, true, 'Services/Feeds');
+		$rssTemplate->setVariable('XML', 'xml');
+		$rssTemplate->setVariable('CONTENT_ENCODING', 'UTF-8');
+		$rssTemplate->setVariable('CHANNEL_TITLE', 'ILIAS KH Freiburg'); // TODO maybe
+		$rssTemplate->setVariable('CHANNEL_DESCRIPTION', 'ILIAS KH Freiburg'); // TODO maybe
+		$rssTemplate->setVariable('CHANNEL_LINK', \ilUtil::_getHttpPath());
 
 		$entries = $this->service->findAllValid();
+
+		$formatter = function(string $string) {
+			return str_replace(
+				['&', '<', '>'],
+				['&amp;', '&lt;', '&lt;'],
+				$string
+			);
+		};
+
 		foreach ($entries as $entry) {
-			// TODO: Write to RSS/XML
+			$rssTemplate->setCurrentBlock('item');
+			$rssTemplate->setVariable('ITEM_TITLE', $formatter($entry->getTitle()));
+			$rssTemplate->setVariable('ITEM_DESCRIPTION', $formatter($entry->getContent()));
+			$rssTemplate->setVariable('ITEM_LINK', $formatter(\ilLink::_getLink($entry->getId(), 'announcements')));
+			$rssTemplate->setVariable('ITEM_ABOUT', $formatter(\ilLink::_getLink($entry->getId(), 'announcements', [
+				'&il_about_feed' => $entry->getId()
+			])));
+			// TODO: Use the published_ts instead
+			$rssTemplate->setVariable('ITEM_DATE', $formatter((new \DateTimeImmutable(
+				'@' . $entry->getCreatedTs(),
+				new \DateTimeZone('UTC')
+			))->format('r')));
+			$rssTemplate->parseCurrentBlock();
 		}
 
 		$response = $response
 			->withStatus(200)
 			->withHeader('Content-Type', 'text/xml; charset=UTF-8;')
 			->withBody($stream = Streams::ofString(
-				$body
+				$rssTemplate->get()
 			));
 
 		return $response;
