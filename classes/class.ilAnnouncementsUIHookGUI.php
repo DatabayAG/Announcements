@@ -81,7 +81,7 @@ class ilAnnouncementsUIHookGUI extends ilUIHookPluginGUI
 		global $DIC;
 
 		$parts = explode('_', $a_target);
-		if ($parts[0] == 'announcements') {
+		if ('announcements' === $parts[0]) {
 			$_GET['baseClass'] = ilUIPluginRouterGUI::class;
 			$DIC->ctrl()->setTargetScript('ilias.php');
 			// TODO: Permanent links should be created with ilLink::_getLink($entry->getId(), 'announcements')
@@ -89,7 +89,7 @@ class ilAnnouncementsUIHookGUI extends ilUIHookPluginGUI
 				$DIC->ctrl()->setParameterByClass(self::class, 'entry_id', $parts[1]);
 				$DIC->ctrl()->redirectByClass([
 					ilUIPluginRouterGUI::class, self::class],
-					'###A command for the detail view###' //TODO
+					'###A command for the detail view###' //TODO Use a command link for a detail entry presentation
 				);
 			}
 		}

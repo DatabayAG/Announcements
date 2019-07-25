@@ -38,6 +38,34 @@ class Handler implements RequestHandlerInterface
 	}
 
 	/**
+	 * @param string $url
+	 * @return string
+	 */
+	private function adjustUrl(string $url) : string 
+	{
+		$plugin = basename(dirname(__DIR__, 2));
+
+		return preg_replace(
+			'/(.*?)\/Customizing\/.*?(' . preg_quote($plugin) . '(\/.*?\.php.*?)?)$/',
+			'$1$3',
+			$url
+		);
+	}
+
+	/**
+	 * @param string $string
+	 * @return string
+	 */
+	private function entities(string $string) : string
+	{
+		return str_replace(
+			['&', '<', '>'],
+			['&amp;', '&lt;', '&lt;'],
+			$string
+		);
+	}
+
+	/**
 	 * @inheritDoc
 	 */
 	public function handle(ServerRequestInterface $request) : ResponseInterface
@@ -70,29 +98,20 @@ class Handler implements RequestHandlerInterface
 		$rssTemplate->setVariable('CONTENT_ENCODING', 'UTF-8');
 		$rssTemplate->setVariable('CHANNEL_TITLE', 'ILIAS KH Freiburg'); // TODO maybe
 		$rssTemplate->setVariable('CHANNEL_DESCRIPTION', 'ILIAS KH Freiburg'); // TODO maybe
-		$rssTemplate->setVariable('CHANNEL_LINK', \ilUtil::_getHttpPath());
+		$rssTemplate->setVariable('CHANNEL_LINK', $this->adjustUrl(\ilUtil::_getHttpPath()));
 
 		$entries = $this->service->findAllValid();
 
-		$formatter = function(string $string) {
-			return str_replace(
-				['&', '<', '>'],
-				['&amp;', '&lt;', '&lt;'],
-				$string
-			);
-		};
-
 		foreach ($entries as $entry) {
 			$rssTemplate->setCurrentBlock('item');
-			$rssTemplate->setVariable('ITEM_TITLE', $formatter($entry->getTitle()));
-			$rssTemplate->setVariable('ITEM_DESCRIPTION', $formatter($entry->getContent()));
-			$rssTemplate->setVariable('ITEM_LINK', $formatter(\ilLink::_getLink($entry->getId(), 'announcements')));
-			$rssTemplate->setVariable('ITEM_ABOUT', $formatter(\ilLink::_getLink($entry->getId(), 'announcements', [
-				'&il_about_feed' => $entry->getId()
-			])));
-			// TODO: Use the published_ts instead
-			$rssTemplate->setVariable('ITEM_DATE', $formatter((new \DateTimeImmutable(
-				'@' . $entry->getCreatedTs(),
+			$rssTemplate->setVariable('ITEM_TITLE', $this->entities($entry->getTitle()));
+			$rssTemplate->setVariable('ITEM_DESCRIPTION', $this->entities($entry->getContent()));
+			$rssTemplate->setVariable('ITEM_LINK', $this->entities($this->adjustUrl(\ilLink::_getLink($entry->getId(), 'announcements'))));
+			$rssTemplate->setVariable('ITEM_ABOUT', $this->entities($this->adjustUrl(\ilLink::_getLink($entry->getId(), 'announcements', [
+				'il_about_feed' => $entry->getId()
+			]))));
+			$rssTemplate->setVariable('ITEM_DATE', $this->entities((new \DateTimeImmutable(
+				'@' . $entry->getPublishTs(),
 				new \DateTimeZone('UTC')
 			))->format('r')));
 			$rssTemplate->parseCurrentBlock();
