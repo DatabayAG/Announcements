@@ -3,6 +3,7 @@
 
 namespace ILIAS\Plugin\Announcements\AccessControl;
 
+use ILIAS\Plugin\Announcements\Administration\GeneralSettings\Settings;
 use ILIAS\Plugin\Announcements\Entry\Model;
 
 /**
@@ -20,27 +21,32 @@ class RoleBasedAccessHandler implements AccessHandler
 
 	/** @var Acl */
 	private $acl;
-	
-	/** @var string */
-	private $aclRole = '';
+
+	/** @var Settings */
+	private $settings;
+
+	/** @var int[] */
+	protected $assignedGlobalRoles = [];
 
 	/**
 	 * RoleBasedAccessHandler constructor.
 	 * @param \ilObjUser    $actor
+	 * @param Settings      $settings
 	 * @param \ilRbacReview $rbacReview
 	 * @param Acl           $acl
 	 */
 	public function __construct(
 		\ilObjUser $actor,
+		Settings $settings,
 		\ilRbacReview $rbacReview,
 		Acl $acl
 	) {
 		$this->actor = $actor;
+		$this->settings = $settings;
 		$this->rbacReview = $rbacReview;
 		$this->acl = $acl;
 
-		// TODO: Determine reader, creator, or manager
-		$this->aclRole = 'reader';
+		$this->assignedGlobalRoles = $this->rbacReview->assignedGlobalRoles($this->actor->getId());
 	}
 
 	/**
@@ -51,6 +57,7 @@ class RoleBasedAccessHandler implements AccessHandler
 	{
 		$clone = clone $this;
 		$clone->actor = $actor;
+		$clone->assignedGlobalRoles = $this->rbacReview->assignedGlobalRoles($actor->getId());
 
 		return $clone;
 	}
@@ -68,7 +75,7 @@ class RoleBasedAccessHandler implements AccessHandler
 	 */
 	public function mayReadEntries() : bool
 	{
-		return !$this->isActorAnonymous() && $this->acl->isAllowed($this->aclRole, 'list', 'read');
+		return !$this->isActorAnonymous() && $this->hasAccess('list', 'read');
 	}
 
 	/**
@@ -76,7 +83,7 @@ class RoleBasedAccessHandler implements AccessHandler
 	 */
 	public function mayCreateEntries() : bool
 	{
-		return !$this->isActorAnonymous() && $this->acl->isAllowed($this->aclRole, 'entry', 'create');
+		return !$this->isActorAnonymous() && $this->hasAccess('entry', 'create');
 	}
 
 	/**
@@ -88,7 +95,7 @@ class RoleBasedAccessHandler implements AccessHandler
 			!$this->isActorAnonymous() &&
 			(
 				(int) $this->actor->getId() === (int) $entry->getCreatorUsrId() ||
-				$this->acl->isAllowed($this->aclRole, 'entry', 'modify')
+				$this->hasAccess('entry', 'modify')
 			)
 		);
 	}
@@ -102,7 +109,7 @@ class RoleBasedAccessHandler implements AccessHandler
 			!$this->isActorAnonymous() &&
 			(
 				(int) $this->actor->getId() === (int) $entry->getCreatorUsrId() ||
-				$this->acl->isAllowed($this->aclRole, 'entry', 'delete')
+				$this->hasAccess('entry', 'delete')
 			)
 		);
 	}
@@ -112,7 +119,7 @@ class RoleBasedAccessHandler implements AccessHandler
 	 */
 	public function mayMakeStickyEntries() : bool
 	{
-		return !$this->isActorAnonymous() && $this->acl->isAllowed($this->aclRole, 'entry', 'makeSticky');
+		return !$this->isActorAnonymous() && $this->hasAccess('entry', 'makeSticky');
 	}
 
 	/**
@@ -120,7 +127,7 @@ class RoleBasedAccessHandler implements AccessHandler
 	 */
 	public function mayReadExpiredEntries() : bool
 	{
-		return !$this->isActorAnonymous() && $this->acl->isAllowed($this->aclRole, 'list', 'readExpired');
+		return !$this->isActorAnonymous() && $this->hasAccess('list', 'readExpired');
 	}
 
 	/**
@@ -128,6 +135,28 @@ class RoleBasedAccessHandler implements AccessHandler
 	 */
 	public function mayReadUnpublishedEntries() : bool
 	{
-		return !$this->isActorAnonymous() && $this->acl->isAllowed($this->aclRole, 'list', 'readUnpublished');
+		return !$this->isActorAnonymous() && $this->hasAccess('list', 'readUnpublished');
+	}
+
+	/**
+	 * @param string $resource
+	 * @param string $privilege
+	 * @return bool
+	 */
+	private function hasAccess(string $resource, string $privilege) : bool
+	{
+		$hasAccess = false;
+
+		foreach ($this->settings->getAclRoleToGlobalRoleMappings() as $aclRole => $globalRoleIds) {
+			$roles = array_intersect($globalRoleIds, $this->assignedGlobalRoles);
+			if (count($roles) > 0) {
+				$hasAccess = $this->acl->isAllowed($aclRole, $resource, $privilege);
+				if ($hasAccess) {
+					return $hasAccess;
+				}
+			}
+		}
+
+		return $hasAccess;
 	}
 }

@@ -63,6 +63,7 @@ class ilAnnouncementsPlugin extends ilUserInterfaceHookPlugin
 			$GLOBALS['DIC']['plugin.announcements.accessHandler'] = function(Container $c) {
 				return new RoleBasedAccessHandler(
 					$c->user(),
+					$c['plugin.announcements.settings'],
 					$c->rbac()->review(),
 					$c['plugin.announcements.acl']
 				);

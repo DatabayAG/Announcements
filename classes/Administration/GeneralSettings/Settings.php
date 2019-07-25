@@ -91,6 +91,14 @@ class Settings implements Bindable
 	}
 
 	/**
+	 * @return array
+	 */
+	public function getAclRoleToGlobalRoleMappings() : array
+	{
+		return $this->aclRoleToGlobalRoleMappings;
+	}
+
+	/**
 	 * @inheritdoc
 	 */
 	public function onFormSaved()
