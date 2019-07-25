@@ -78,30 +78,32 @@ class ilAnnouncementsPlugin extends ilUserInterfaceHookPlugin
 
 			$GLOBALS['DIC']['plugin.announcements.settings'] = function(Container $c) {
 				return new Settings(
-					new \ilSetting($this->getId())
+					new \ilSetting($this->getId()),
+					$c['plugin.announcements.acl']
 				);
 			};
 
 			$GLOBALS['DIC']['plugin.announcements.acl'] = function(Container $c) {
 				$acl = new Impl(new Registry());
 
-				$acl->addRole(new GenericRole('reader'))
-				           ->addRole(new GenericRole('creator'))
-				           ->addRole(new GenericRole('manager'))
-				           ->addResource(new GenericResource('entry'))
-				           ->addResource(new GenericResource('list'))
-				           ->allow('reader', 'list', 'read')
-				           ->allow('creator', 'list', 'read')
-				           ->allow('creator', 'list', 'readUnpublished')
-				           ->allow('creator', 'list', 'readExpired')
-				           ->allow('creator', 'entry', 'create')
-				           ->allow('creator', 'entry', 'modify')
-				           ->allow('creator', 'list', 'read')
-				           ->allow('manager', 'list', 'readUnpublished')
-				           ->allow('manager', 'list', 'readExpired')
-				           ->allow('manager', 'entry', 'modify')
-				           ->allow('manager', 'entry', 'delete')
-				           ->allow('manager', 'entry', 'makeSticky');
+				$acl
+					->addRole(new GenericRole('reader'))
+					->addRole(new GenericRole('creator'))
+					->addRole(new GenericRole('manager'))
+					->addResource(new GenericResource('entry'))
+					->addResource(new GenericResource('list'))
+					->allow('reader', 'list', 'read')
+					->allow('creator', 'list', 'read')
+					->allow('creator', 'list', 'readUnpublished')
+					->allow('creator', 'list', 'readExpired')
+					->allow('creator', 'entry', 'create')
+					->allow('creator', 'entry', 'modify')
+					->allow('creator', 'list', 'read')
+					->allow('manager', 'list', 'readUnpublished')
+					->allow('manager', 'list', 'readExpired')
+					->allow('manager', 'entry', 'modify')
+					->allow('manager', 'entry', 'delete')
+					->allow('manager', 'entry', 'makeSticky');
 
 				return $acl;
 			};

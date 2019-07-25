@@ -4,6 +4,7 @@
 namespace ILIAS\Plugin\Announcements\Administration\GeneralSettings\UI;
 
 use ILIAS\Plugin\Announcements\UI\Form\Bindable;
+use ILIAS\Plugin\Announcements\AccessControl\Acl;
 
 /**
  * Class Form
@@ -21,20 +22,38 @@ class Form extends \ilPropertyFormGUI
 	/** @var Bindable */
 	private $generalSettings;
 
+	/** @var \ilObjectDataCache */
+	private $objectCache;
+
+	/** @var \ilRbacReview */
+	protected $rbacReview;
+
+	/** @var Acl */
+	private $acl;
+
 	/**
 	 * Form constructor.
 	 * @param \ilAnnouncementsPlugin $plugin
-	 * @param object              $cmdObject
-	 * @param Bindable            $generalSettings
+	 * @param object                 $cmdObject
+	 * @param Bindable               $generalSettings
+	 * @param \ilObjectDataCache     $objectCache
+	 * @param \ilRbacReview          $rbacReview
+	 * @param Acl                    $acl
 	 */
 	public function __construct(
 		\ilAnnouncementsPlugin $plugin,
 		$cmdObject,
-		Bindable $generalSettings
+		Bindable $generalSettings,
+		\ilObjectDataCache $objectCache,
+		\ilRbacReview $rbacReview,
+		Acl $acl
 	) {
 		$this->plugin = $plugin;
 		$this->cmdObject = $cmdObject;
 		$this->generalSettings = $generalSettings;
+		$this->objectCache = $objectCache;
+		$this->rbacReview = $rbacReview;
+		$this->acl = $acl;
 		parent::__construct();
 
 		$this->initForm();
@@ -48,6 +67,24 @@ class Form extends \ilPropertyFormGUI
 		$this->setFormAction($this->ctrl->getFormAction($this->cmdObject, 'saveSettings'));
 		$this->setTitle($this->lng->txt('settings'));
 		
+		$roles = [];
+		foreach ($this->rbacReview->getGlobalRoles() as $roleId) {
+			if ($roleId !== ANONYMOUS_ROLE_ID ) {
+				$roles[$roleId] = $this->objectCache->lookupTitle($roleId);
+			}
+		}
+		asort($roles);
+
+		foreach ($this->acl->getRoles() as $role) {
+			$roleMapping = new \ilMultiSelectInputGUI(
+				$this->plugin->txt('acl_role_' . $role->getRoleId()),
+				'role_mapping_' . $role->getRoleId()
+			);
+			$roleMapping->setInfo($this->plugin->txt('acl_role_mapping_please_assign_groles'));
+			$roleMapping->setOptions($roles);
+			$this->addItem($roleMapping);
+		}
+
 		$rssSection = new \ilFormSectionHeaderGUI();
 		$rssSection->setTitle($this->plugin->txt('adm_form_head_rss'));
 		$this->addItem($rssSection);

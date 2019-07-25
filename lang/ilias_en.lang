@@ -3,3 +3,7 @@ adm_form_lbl_channel_title#:#Channel Title
 adm_form_lbl_channel_title_info#:#Please define the title for the RSS channel.
 adm_form_lbl_channel_desc#:#Channel Description
 adm_form_lbl_channel_desc_info#:#Please define the description for the RSS channel.
+acl_role_reader#:#Reader
+acl_role_creator#:#Creator
+acl_role_manager#:#Manager
+acl_role_mapping_please_assign_groles#:#Bitte weisen Sie der Rolle ein oder mehrere globale ILIAS-Rollen zu.

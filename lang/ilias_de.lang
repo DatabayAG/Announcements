@@ -3,3 +3,7 @@ adm_form_lbl_channel_title#:#Channel Titel
 adm_form_lbl_channel_title_info#:#Hier können Sie den Titel des RSS-Channels definieren.
 adm_form_lbl_channel_desc#:#Channel Beschreibung
 adm_form_lbl_channel_desc_info#:#Hier können Sie die Beschreibung des RSS-Channels definieren.
+acl_role_reader#:#Ankündigungsleser
+acl_role_creator#:#Ankündigungsersteller
+acl_role_manager#:#Ankündigungsmanager
+acl_role_mapping_please_assign_groles#:#Bitte weisen Sie der Rolle ein oder mehrere globale ILIAS-Rollen zu.

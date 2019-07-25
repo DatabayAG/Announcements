@@ -4,6 +4,7 @@
 namespace ILIAS\Plugin\Announcements\Administration\Controller;
 
 use ILIAS\Plugin\Announcements\Administration\GeneralSettings\Settings;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Class Base
@@ -32,9 +33,18 @@ abstract class Base extends \ilPluginConfigGUI
 
 	/** @var \ILIAS\UI\Renderer */
 	protected $uiRenderer;
+	
+	/** @var ServerRequestInterface */
+	protected $request;
 
 	/** @var \ilAnnouncementsPlugin */
 	protected $plugin_object;
+
+	/** @var \ilRbacReview */
+	protected $rbacReview;
+
+	/** @var \ilObjectDataCache */
+	protected $objectCache;
 
 	/**
 	 * Base constructor.
@@ -50,6 +60,9 @@ abstract class Base extends \ilPluginConfigGUI
 		$this->user       = $DIC->user();
 		$this->uiFactory  = $DIC->ui()->factory();
 		$this->uiRenderer = $DIC->ui()->renderer();
+		$this->request    = $DIC->http()->request();
+		$this->rbacReview = $DIC->rbac()->review();
+		$this->objectCache = $DIC['ilObjDataCache'];
 		$this->settings   = $DIC['plugin.announcements.settings'];
 
 		$this->plugin_object = $plugin_object;

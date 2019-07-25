@@ -3,6 +3,7 @@
 
 namespace ILIAS\Plugin\Announcements\Administration\GeneralSettings;
 
+use ILIAS\Plugin\Announcements\AccessControl\Acl;
 use ILIAS\Plugin\Announcements\UI\Form\Bindable;
 
 /**
@@ -21,21 +22,38 @@ class Settings implements Bindable
 	/** @var string */
 	private $rssChannelDescription = '';
 
+	/** @var Acl */
+	private $acl;
+
+	/** @var array */
+	protected $aclRoleToGlobalRoleMappings = [];
+
 	/**
 	 * Settings constructor.
 	 * @param \ilSetting $settings
+	 * @param Acl        $acl
 	 */
-	public function __construct(\ilSetting $settings)
+	public function __construct(\ilSetting $settings, Acl $acl)
 	{
 		$this->settings = $settings;
 
 		$this->read();
+		$this->acl = $acl;
 	}
 
+	/**
+	 *
+	 */
 	protected function read()
 	{
-		$this->rssChannelTitle       = (string) $this->settings->get('rss_channel_title', '');
-		$this->rssChannelDescription = (string) $this->settings->get('rss_channel_desc', '');
+		$this->rssChannelTitle             = (string) $this->settings->get('rss_channel_title', '');
+		$this->rssChannelDescription       = (string) $this->settings->get('rss_channel_desc', '');
+		$this->aclRoleToGlobalRoleMappings = unserialize(
+			$this->settings->get('aclr_to_role_mapping', serialize([])),
+			[
+				'allowed_classes' => false
+			]
+		);
 	}
 
 	/**
@@ -45,6 +63,15 @@ class Settings implements Bindable
 	{
 		$this->rssChannelTitle       = $form->getInput('rss_channel_title');
 		$this->rssChannelDescription = $form->getInput('rss_channel_desc');
+
+		$mappingByRole = [];
+		foreach ($this->acl->getRoles() as $role) {
+			$mapping                           = array_filter(array_map('intval',
+				(array) $form->getInput('role_mapping_' . $role->getRoleId())
+			));
+			$mappingByRole[$role->getRoleId()] = $mapping;
+		}
+		$this->aclRoleToGlobalRoleMappings = $mappingByRole;
 	}
 
 	/**
@@ -56,14 +83,6 @@ class Settings implements Bindable
 	}
 
 	/**
-	 * @param string $rssChannelTitle
-	 */
-	public function setRssChannelTitle(string $rssChannelTitle)
-	{
-		$this->rssChannelTitle = $rssChannelTitle;
-	}
-
-	/**
 	 * @return string
 	 */
 	public function getRssChannelDescription() : string
@@ -72,20 +91,13 @@ class Settings implements Bindable
 	}
 
 	/**
-	 * @param string $rssChannelDescription
-	 */
-	public function setRssChannelDescription(string $rssChannelDescription)
-	{
-		$this->rssChannelDescription = $rssChannelDescription;
-	}
-
-	/**
 	 * @inheritdoc
 	 */
-	public function onFormSaved() : void
+	public function onFormSaved()
 	{
 		$this->settings->set('rss_channel_title', $this->rssChannelTitle);
 		$this->settings->set('rss_channel_desc', $this->rssChannelDescription);
+		$this->settings->set('aclr_to_role_mapping', serialize($this->aclRoleToGlobalRoleMappings));
 	}
 
 	/**
@@ -93,9 +105,18 @@ class Settings implements Bindable
 	 */
 	public function toArray() : array
 	{
-		return [
+		$data = [
 			'rss_channel_title' => $this->rssChannelTitle,
 			'rss_channel_desc'  => $this->rssChannelDescription,
 		];
+
+		foreach ($this->acl->getRoles() as $role) {
+			$data['role_mapping_' . $role->getRoleId()] = [];
+			if (isset($this->aclRoleToGlobalRoleMappings[$role->getRoleId()])) {
+				$data['role_mapping_' . $role->getRoleId()] = $this->aclRoleToGlobalRoleMappings[$role->getRoleId()];
+			}
+		}
+
+		return $data;
 	}
 }

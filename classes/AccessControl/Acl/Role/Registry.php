@@ -33,9 +33,7 @@ class Registry
 			));
 		}
 
-		$this->roles[$roleId] = [
-			'instance' => $role
-		];
+		$this->roles[$roleId] = $role;
 
 		return $this;
 	}
@@ -57,7 +55,7 @@ class Registry
 			throw new InvalidArgument("Role '$roleId' not found");
 		}
 
-		return $this->roles[$roleId]['instance'];
+		return $this->roles[$roleId];
 	}
 
 	/**
@@ -76,7 +74,7 @@ class Registry
 	}
 
 	/**
-	 * @return array
+	 * @return Role
 	 */
 	public function getRoles() : array
 	{
