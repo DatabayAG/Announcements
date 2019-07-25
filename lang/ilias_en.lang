@@ -1,0 +1,5 @@
+adm_form_head_rss#:#RSS
+adm_form_lbl_channel_title#:#Channel Title
+adm_form_lbl_channel_title_info#:#Please define the title for the RSS channel.
+adm_form_lbl_channel_desc#:#Channel Description
+adm_form_lbl_channel_desc_info#:#Please define the description for the RSS channel.

@@ -5,6 +5,7 @@ namespace ILIAS\Plugin\Announcements\Rss;
 
 use ILIAS\DI\HTTPServices;
 use ILIAS\Filesystem\Stream\Streams;
+use ILIAS\Plugin\Announcements\Administration\GeneralSettings\Settings;
 use ILIAS\Plugin\Announcements\Entry\Service;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -24,17 +25,23 @@ class Handler implements RequestHandlerInterface
 	 */
 	private $service;
 
+	/** @var Settings */
+	private $generalSettings;
+
 	/**
 	 * Exporter constructor.
 	 * @param HTTPServices $httpServices
 	 * @param Service      $service
+	 * @param Settings     $generalSettings
 	 */
 	public function __construct(
 		HTTPServices $httpServices,
-		Service $service
+		Service $service,
+		Settings $generalSettings
 	) {
 		$this->httpServices = $httpServices;
 		$this->service = $service;
+		$this->generalSettings = $generalSettings;
 	}
 
 	/**
@@ -96,8 +103,8 @@ class Handler implements RequestHandlerInterface
 		$rssTemplate = new \ilTemplate('tpl.rss_2_0.xml', true, true, 'Services/Feeds');
 		$rssTemplate->setVariable('XML', 'xml');
 		$rssTemplate->setVariable('CONTENT_ENCODING', 'UTF-8');
-		$rssTemplate->setVariable('CHANNEL_TITLE', 'ILIAS KH Freiburg'); // TODO maybe
-		$rssTemplate->setVariable('CHANNEL_DESCRIPTION', 'ILIAS KH Freiburg'); // TODO maybe
+		$rssTemplate->setVariable('CHANNEL_TITLE', $this->entities($this->generalSettings->getRssChannelTitle()));
+		$rssTemplate->setVariable('CHANNEL_DESCRIPTION', $this->entities($this->generalSettings->getRssChannelDescription()));
 		$rssTemplate->setVariable('CHANNEL_LINK', $this->adjustUrl(\ilUtil::_getHttpPath()));
 
 		$entries = $this->service->findAllValid();

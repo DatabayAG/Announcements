@@ -4,6 +4,7 @@
 use ILIAS\DI\Container;
 use ILIAS\GlobalScreen\Scope\MainMenu\Provider\AbstractStaticPluginMainMenuProvider;
 use ILIAS\Plugin\Announcements\AccessControl\RoleBasedAccessHandler;
+use ILIAS\Plugin\Announcements\Administration\GeneralSettings\Settings;
 use ILIAS\Plugin\Announcements\Entry\Service;
 
 /**
@@ -67,6 +68,12 @@ class ilAnnouncementsPlugin extends ilUserInterfaceHookPlugin
 					$c->user(),
 					$c->database(),
 					$c['plugin.announcements.accessHandler']
+				);
+			};
+
+			$GLOBALS['DIC']['plugin.announcements.settings'] = function(Container $c) {
+				return new Settings(
+					new \ilSetting($this->getId())
 				);
 			};
 		}
