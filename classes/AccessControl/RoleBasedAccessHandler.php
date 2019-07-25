@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /* Copyright (c) 1998-2019 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 namespace ILIAS\Plugin\Announcements\AccessControl;
@@ -18,17 +18,29 @@ class RoleBasedAccessHandler implements AccessHandler
 	/** @var \ilRbacReview */
 	private $rbacReview;
 
+	/** @var Acl */
+	private $acl;
+	
+	/** @var string */
+	private $aclRole = '';
+
 	/**
 	 * RoleBasedAccessHandler constructor.
 	 * @param \ilObjUser    $actor
 	 * @param \ilRbacReview $rbacReview
+	 * @param Acl           $acl
 	 */
 	public function __construct(
 		\ilObjUser $actor,
-		\ilRbacReview $rbacReview
+		\ilRbacReview $rbacReview,
+		Acl $acl
 	) {
 		$this->actor = $actor;
 		$this->rbacReview = $rbacReview;
+		$this->acl = $acl;
+
+		// TODO: Determine reader, creator, or manager
+		$this->aclRole = 'reader';
 	}
 
 	/**
@@ -56,8 +68,7 @@ class RoleBasedAccessHandler implements AccessHandler
 	 */
 	public function mayReadEntries() : bool
 	{
-		// TODO: Implement mayReadEntry() method.
-		return !$this->isActorAnonymous();
+		return !$this->isActorAnonymous() && $this->acl->isAllowed($this->aclRole, 'list', 'read');
 	}
 
 	/**
@@ -65,8 +76,7 @@ class RoleBasedAccessHandler implements AccessHandler
 	 */
 	public function mayCreateEntries() : bool
 	{
-		// TODO: Implement mayCreateEntries() method.
-		return !$this->isActorAnonymous();
+		return !$this->isActorAnonymous() && $this->acl->isAllowed($this->aclRole, 'entry', 'create');
 	}
 
 	/**
@@ -77,8 +87,8 @@ class RoleBasedAccessHandler implements AccessHandler
 		return (
 			!$this->isActorAnonymous() &&
 			(
-				(int) $this->actor->getId() === (int) $entry->getCreatorUsrId()
-				// TODO: Order Rolle darf
+				(int) $this->actor->getId() === (int) $entry->getCreatorUsrId() ||
+				$this->acl->isAllowed($this->aclRole, 'entry', 'modify')
 			)
 		);
 	}
@@ -91,8 +101,8 @@ class RoleBasedAccessHandler implements AccessHandler
 		return (
 			!$this->isActorAnonymous() &&
 			(
-				(int) $this->actor->getId() === (int) $entry->getCreatorUsrId()
-				// TODO: Order Rolle darf
+				(int) $this->actor->getId() === (int) $entry->getCreatorUsrId() ||
+				$this->acl->isAllowed($this->aclRole, 'entry', 'delete')
 			)
 		);
 	}
@@ -102,8 +112,7 @@ class RoleBasedAccessHandler implements AccessHandler
 	 */
 	public function mayMakeStickyEntries() : bool
 	{
-		// TODO: Implement mayMakeStickyEntries() method.
-		return !$this->isActorAnonymous();
+		return !$this->isActorAnonymous() && $this->acl->isAllowed($this->aclRole, 'entry', 'makeSticky');
 	}
 
 	/**
@@ -111,7 +120,7 @@ class RoleBasedAccessHandler implements AccessHandler
 	 */
 	public function mayReadExpiredEntries() : bool
 	{
-		return !$this->isActorAnonymous();
+		return !$this->isActorAnonymous() && $this->acl->isAllowed($this->aclRole, 'list', 'readExpired');
 	}
 
 	/**
@@ -119,6 +128,6 @@ class RoleBasedAccessHandler implements AccessHandler
 	 */
 	public function mayReadUnpublishedEntries() : bool
 	{
-		return !$this->isActorAnonymous();
+		return !$this->isActorAnonymous() && $this->acl->isAllowed($this->aclRole, 'list', 'readUnpublished');
 	}
 }

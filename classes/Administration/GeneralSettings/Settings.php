@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /* Copyright (c) 1998-2019 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 namespace ILIAS\Plugin\Announcements\Administration\GeneralSettings;
@@ -82,7 +82,7 @@ class Settings implements Bindable
 	/**
 	 * @inheritdoc
 	 */
-	public function onFormSaved()
+	public function onFormSaved() : void
 	{
 		$this->settings->set('rss_channel_title', $this->rssChannelTitle);
 		$this->settings->set('rss_channel_desc', $this->rssChannelDescription);

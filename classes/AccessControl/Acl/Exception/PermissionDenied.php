@@ -1,15 +1,15 @@
 <?php declare(strict_types=1);
 /* Copyright (c) 1998-2019 ILIAS open source, Extended GPL, see docs/LICENSE */
 
-namespace ILIAS\Plugin\Announcements\AccessControl\Exception;
+namespace ILIAS\Plugin\Announcements\AccessControl\Acl\Exception;
 
 use ILIAS\Plugin\Announcements\Exception;
 
 /**
- * Class PermissionDenied
- * @package ILIAS\Plugin\Announcements\AccessControl\Exception
+ * Class InvalidArgument
+ * @package ILIAS\Plugin\Announcements\AccessControl\Acl\Exception
  * @author Michael Jansen <mjansen@databay.de>
  */
-class PermissionDenied extends Exception
+class InvalidArgument extends Exception
 {
 }
