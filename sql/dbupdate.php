@@ -59,3 +59,57 @@ if (!$ilDB->tableExists('pl_announcements')) {
 	$ilDB->createSequence('pl_announcements');
 }
 ?>
+<#2>
+<?php
+if ($ilDB->tableExists('pl_announcements')) {
+	if (!$ilDB->tableColumnExists('pl_announcements', 'publish_datetime')) {
+		$ilDB->addTableColumn(
+			'pl_announcements',
+			'publish_datetime',
+			[
+				'type'    => 'timestamp',
+				'notnull' => true,
+			]
+		);
+	}
+
+	if (!$ilDB->tableColumnExists('pl_announcements', 'publish_timezone')) {
+		$ilDB->addTableColumn(
+			'pl_announcements',
+			'publish_timezone',
+			[
+				'type'    => 'text',
+				'notnull' => true,
+				'length' => 100,
+			]
+		);
+	}
+}
+?>
+<#3>
+<?php
+if ($ilDB->tableExists('pl_announcements')) {
+	if (!$ilDB->tableColumnExists('pl_announcements', 'expiration_datetime')) {
+		$ilDB->addTableColumn(
+			'pl_announcements',
+			'expiration_datetime',
+			[
+				'type'    => 'timestamp',
+				'notnull' => true,
+			]
+		);
+	}
+
+	if (!$ilDB->tableColumnExists('pl_announcements', 'expiration_timezone')) {
+		$ilDB->addTableColumn(
+			'pl_announcements',
+			'expiration_timezone',
+			[
+				'type'    => 'text',
+				'notnull' => true,
+				'length' => 100,
+			]
+		);
+	}
+}
+?>

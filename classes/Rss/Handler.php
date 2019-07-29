@@ -6,6 +6,7 @@ namespace ILIAS\Plugin\Announcements\Rss;
 use ILIAS\DI\HTTPServices;
 use ILIAS\Filesystem\Stream\Streams;
 use ILIAS\Plugin\Announcements\Administration\GeneralSettings\Settings;
+use ILIAS\Plugin\Announcements\Entry\Model;
 use ILIAS\Plugin\Announcements\Entry\Service;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -117,10 +118,9 @@ class Handler implements RequestHandlerInterface
 			$rssTemplate->setVariable('ITEM_ABOUT', $this->entities($this->adjustUrl(\ilLink::_getLink($entry->getId(), 'announcements', [
 				'il_about_feed' => $entry->getId()
 			]))));
-			$rssTemplate->setVariable('ITEM_DATE', $this->entities((new \DateTimeImmutable(
-				'@' . $entry->getPublishTs(),
-				new \DateTimeZone('UTC')
-			))->format('r')));
+			$rssTemplate->setVariable('ITEM_DATE', $this->entities(
+				$entry->getPublishOn()->setTimezone(new \DateTimeZone('UTC'))->format('r')
+			));
 			$rssTemplate->parseCurrentBlock();
 		}
 
