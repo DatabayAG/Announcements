@@ -1,0 +1,11 @@
+.announcements{
+	color:#932136;
+	font-weight: bolder;
+	padding:0.8em;
+	margin-bottom:0.8em;
+	background-color: white;
+}
+.announcements_accordion_body{
+	color: black;
+	font-weight: normal;
+}
