@@ -128,6 +128,58 @@ class Service
     }
 
     /**
+     * @param Model $entry
+     * @throws PermissionDenied
+     * @throws CommandLogic
+     * @throws NotFound
+     */
+    public function makeEntrySticky(Model $entry)
+    {
+        if (!$this->accessHandler->mayMakeStickyEntries()) {
+            throw new PermissionDenied('No permission to make entry sticky!');
+        }
+
+        if (!$entry->getId()) {
+            throw new CommandLogic('An entry without id cannot be deleted!');
+        }
+
+        try {
+            $entry::findOrFail($entry->getId());
+        } catch (\arException $e) {
+            throw new NotFound($e->getMessage());
+        }
+
+        $entry->setIsSticky(true);
+        $entry->store();
+    }
+
+    /**
+     * @param Model $entry
+     * @throws PermissionDenied
+     * @throws CommandLogic
+     * @throws NotFound
+     */
+    public function makeEntryLoose(Model $entry)
+    {
+        if (!$this->accessHandler->mayMakeStickyEntries()) {
+            throw new PermissionDenied('No permission to make entry loose!');
+        }
+
+        if (!$entry->getId()) {
+            throw new CommandLogic('An entry without id cannot be deleted!');
+        }
+
+        try {
+            $entry::findOrFail($entry->getId());
+        } catch (\arException $e) {
+            throw new NotFound($e->getMessage());
+        }
+
+        $entry->setIsSticky(false);
+        $entry->store();
+    }
+
+    /**
      * @param bool $onlyRoomChangeRelated
      * @return Model[]
      * @throws PermissionDenied
