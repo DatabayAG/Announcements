@@ -17,180 +17,185 @@ use ILIAS\Plugin\Announcements\Entry\Service;
  */
 class ilAnnouncementsPlugin extends ilUserInterfaceHookPlugin
 {
-	/** @var string */
-	const CTYPE = 'Services';
+    /** @var string */
+    const CTYPE = 'Services';
 
-	/** @var string */
-	const CNAME = 'UIComponent';
+    /** @var string */
+    const CNAME = 'UIComponent';
 
-	/** @var string */
-	const SLOT_ID = 'uihk';
+    /** @var string */
+    const SLOT_ID = 'uihk';
 
-	/** @var string */
-	const PNAME = 'Announcements';
+    /** @var string */
+    const PNAME = 'Announcements';
 
-	/** @var self */
-	private static $instance = null;
+    /** @var self */
+    private static $instance = null;
 
-	/** @var bool */
-	protected static $initialized = false;
+    /** @var bool */
+    protected static $initialized = false;
 
-	/** @var bool[] */
-	protected static $activePluginsCheckCache = [];
+    /** @var bool[] */
+    protected static $activePluginsCheckCache = [];
 
-	/** @var ilPlugin[] */
-	protected static $activePluginsCache = [];
+    /** @var ilPlugin[] */
+    protected static $activePluginsCache = [];
 
-	/**
-	 * @inheritdoc
-	 */
-	public function getPluginName()
-	{
-		return self::PNAME;
-	}
+    /**
+     * @inheritdoc
+     */
+    public function getPluginName()
+    {
+        return self::PNAME;
+    }
 
-	/**
-	 * @inheritdoc
-	 */
-	protected function init()
-	{
-		parent::init();
-		$this->registerAutoloader();
+    /**
+     * @inheritdoc
+     */
+    protected function init()
+    {
+        parent::init();
+        $this->registerAutoloader();
 
-		if (!self::$initialized) {
-			self::$initialized = true;
+        if (!self::$initialized) {
+            self::$initialized = true;
 
-			$GLOBALS['DIC']['plugin.announcements.accessHandler'] = function(Container $c) {
-				return new RoleBasedAccessHandler(
-					$c->user(),
-					$c['plugin.announcements.settings'],
-					$c->rbac()->review(),
-					$c['plugin.announcements.acl']
-				);
-			};
+            $GLOBALS['DIC']['plugin.announcements.accessHandler'] = function (Container $c) {
+                return new RoleBasedAccessHandler(
+                    $c->user(),
+                    $c['plugin.announcements.settings'],
+                    $c->rbac()->review(),
+                    $c['plugin.announcements.acl']
+                );
+            };
 
-			$GLOBALS['DIC']['plugin.announcements.service'] = function(Container $c) {
-				return new Service(
-					$c->user(),
-					$c->database(),
-					$c['plugin.announcements.accessHandler']
-				);
-			};
+            $GLOBALS['DIC']['plugin.announcements.service'] = function (Container $c) {
+                return new Service(
+                    $c->user(),
+                    $c->database(),
+                    $c['plugin.announcements.accessHandler']
+                );
+            };
 
-			$GLOBALS['DIC']['plugin.announcements.settings'] = function(Container $c) {
-				return new Settings(
-					new \ilSetting($this->getId()),
-					$c['plugin.announcements.acl']
-				);
-			};
+            $GLOBALS['DIC']['plugin.announcements.settings'] = function (Container $c) {
+                return new Settings(
+                    new \ilSetting($this->getId()),
+                    $c['plugin.announcements.acl']
+                );
+            };
 
-			$GLOBALS['DIC']['plugin.announcements.acl'] = function(Container $c) {
-				$acl = new Impl(new Registry());
+            $GLOBALS['DIC']['plugin.announcements.acl'] = function (Container $c) {
+                $acl = new Impl(new Registry());
 
-				$acl
-					->addRole(new GenericRole('reader'))
-					->addRole(new GenericRole('creator'))
-					->addRole(new GenericRole('manager'))
-					->addResource(new GenericResource('entry'))
-					->addResource(new GenericResource('list'))
-					->allow('reader', 'list', 'read')
-					->allow('creator', 'list', 'read')
-					->allow('creator', 'list', 'readUnpublished')
-					->allow('creator', 'list', 'readExpired')
-					->allow('creator', 'entry', 'create')
-					->allow('creator', 'entry', 'modify')
-					->allow('creator', 'list', 'read')
-					->allow('manager', 'list', 'readUnpublished')
-					->allow('manager', 'list', 'readExpired')
-					->allow('manager', 'entry', 'modify')
-					->allow('manager', 'entry', 'delete')
-					->allow('manager', 'entry', 'makeSticky');
+                $acl
+                    ->addRole(new GenericRole('reader'))
+                    ->addRole(new GenericRole('creator'))
+                    ->addRole(new GenericRole('manager'))
+                    ->addResource(new GenericResource('entry'))
+                    ->addResource(new GenericResource('list'))
+                    ->allow('reader', 'list', 'read')
+                    ->allow('creator', 'list', 'read')
+                    ->allow('creator', 'list', 'readUnpublished')
+                    ->allow('creator', 'list', 'readExpired')
+                    ->allow('creator', 'entry', 'create')
+                    ->allow('creator', 'entry', 'modify')
+                    ->allow('creator', 'entry', 'delete')
+                    ->allow('manager', 'list', 'read')
+                    ->allow('manager', 'list', 'readUnpublished')
+                    ->allow('manager', 'list', 'readExpired')
+                    ->allow('manager', 'entry', 'create')
+                    ->allow('manager', 'entry', 'modify')
+                    ->allow('manager', 'entry', 'delete')
+                    ->allow('manager', 'entry', 'createUnlimited')
+                    ->allow('manager', 'entry', 'modifyUnlimited')
+                    ->allow('manager', 'entry', 'deleteUnlimited')
+                    ->allow('manager', 'entry', 'makeSticky');
 
-				return $acl;
-			};
-		}
-	}
+                return $acl;
+            };
+        }
+    }
 
-	/**
-	 * Registers the plugin autoloader
-	 */
-	public function registerAutoloader()
-	{
-		require_once dirname(__FILE__) . '/../autoload.php';
-	}
+    /**
+     * Registers the plugin autoloader
+     */
+    public function registerAutoloader()
+    {
+        require_once dirname(__FILE__) . '/../autoload.php';
+    }
 
-	/**
-	 * @return self
-	 */
-	public static function getInstance() : self
-	{
-		if (null === self::$instance) {
-			return self::$instance = ilPluginAdmin::getPluginObject(
-				self::CTYPE,
-				self::CNAME,
-				self::SLOT_ID,
-				self::PNAME
-			);
-		}
+    /**
+     * @return self
+     */
+    public static function getInstance() : self
+    {
+        if (null === self::$instance) {
+            return self::$instance = ilPluginAdmin::getPluginObject(
+                self::CTYPE,
+                self::CNAME,
+                self::SLOT_ID,
+                self::PNAME
+            );
+        }
 
-		return self::$instance;
-	}
+        return self::$instance;
+    }
 
-	/**
-	 * @param string $component
-	 * @param string $slot
-	 * @param string $plugin_class
-	 * @return bool
-	 */
-	public function isPluginInstalled($component, $slot, $plugin_class) : bool
-	{
-		if (isset(self::$activePluginsCheckCache[$component][$slot][$plugin_class])) {
-			return self::$activePluginsCheckCache[$component][$slot][$plugin_class];
-		}
+    /**
+     * @param string $component
+     * @param string $slot
+     * @param string $plugin_class
+     * @return bool
+     */
+    public function isPluginInstalled($component, $slot, $plugin_class) : bool
+    {
+        if (isset(self::$activePluginsCheckCache[$component][$slot][$plugin_class])) {
+            return self::$activePluginsCheckCache[$component][$slot][$plugin_class];
+        }
 
-		foreach (
-			$GLOBALS['ilPluginAdmin']->getActivePluginsForSlot(IL_COMP_SERVICE, $component, $slot) as $plugin_name
-		) {
-			$plugin = ilPluginAdmin::getPluginObject(IL_COMP_SERVICE, $component, $slot, $plugin_name);
-			if (class_exists($plugin_class) && $plugin instanceof $plugin_class) {
-				return (self::$activePluginsCheckCache[$component][$slot][$plugin_class] = true);
-			}
-		}
+        foreach (
+            $GLOBALS['ilPluginAdmin']->getActivePluginsForSlot(IL_COMP_SERVICE, $component, $slot) as $plugin_name
+        ) {
+            $plugin = ilPluginAdmin::getPluginObject(IL_COMP_SERVICE, $component, $slot, $plugin_name);
+            if (class_exists($plugin_class) && $plugin instanceof $plugin_class) {
+                return (self::$activePluginsCheckCache[$component][$slot][$plugin_class] = true);
+            }
+        }
 
-		return (self::$activePluginsCheckCache[$component][$slot][$plugin_class] = false);
-	}
+        return (self::$activePluginsCheckCache[$component][$slot][$plugin_class] = false);
+    }
 
-	/**
-	 * @param string $component
-	 * @param string $slot
-	 * @param string $plugin_class
-	 * @return ilPlugin
-	 * @throws ilException
-	 */
-	public function getPlugin($component, $slot, $plugin_class) : ilPlugin
-	{
-		if (isset(self::$activePluginsCache[$component][$slot][$plugin_class])) {
-			return self::$activePluginsCache[$component][$slot][$plugin_class];
-		}
+    /**
+     * @param string $component
+     * @param string $slot
+     * @param string $plugin_class
+     * @return ilPlugin
+     * @throws ilException
+     */
+    public function getPlugin($component, $slot, $plugin_class) : ilPlugin
+    {
+        if (isset(self::$activePluginsCache[$component][$slot][$plugin_class])) {
+            return self::$activePluginsCache[$component][$slot][$plugin_class];
+        }
 
-		foreach (
-			$GLOBALS['ilPluginAdmin']->getActivePluginsForSlot(IL_COMP_SERVICE, $component, $slot) as $plugin_name
-		) {
-			$plugin = ilPluginAdmin::getPluginObject(IL_COMP_SERVICE, $component, $slot, $plugin_name);
-			if (class_exists($plugin_class) && $plugin instanceof $plugin_class) {
-				return (self::$activePluginsCache[$component][$slot][$plugin_class] = $plugin);
-			}
-		}
+        foreach (
+            $GLOBALS['ilPluginAdmin']->getActivePluginsForSlot(IL_COMP_SERVICE, $component, $slot) as $plugin_name
+        ) {
+            $plugin = ilPluginAdmin::getPluginObject(IL_COMP_SERVICE, $component, $slot, $plugin_name);
+            if (class_exists($plugin_class) && $plugin instanceof $plugin_class) {
+                return (self::$activePluginsCache[$component][$slot][$plugin_class] = $plugin);
+            }
+        }
 
-		throw new ilException($plugin_class . ' plugin not installed!');
-	}
+        throw new ilException($plugin_class . ' plugin not installed!');
+    }
 
-	/**
-	 * @inheritdoc
-	 */
-	public function promoteGlobalScreenProvider() : AbstractStaticPluginMainMenuProvider
-	{
-		$this->includeClass('class.ilAnnouncementsGlobalScreenProviderPlugin.php');
-		return new ilAnnouncementsGlobalScreenProviderPlugin($GLOBALS['DIC'], $this);
-	}
+    /**
+     * @inheritdoc
+     */
+    public function promoteGlobalScreenProvider() : AbstractStaticPluginMainMenuProvider
+    {
+        $this->includeClass('class.ilAnnouncementsGlobalScreenProviderPlugin.php');
+        return new ilAnnouncementsGlobalScreenProviderPlugin($GLOBALS['DIC'], $this);
+    }
 }
