@@ -4,6 +4,8 @@
 use ILIAS\DI\Container;
 use ILIAS\Plugin\Announcements\Frontend;
 use ILIAS\Plugin\Announcements\Frontend\Controller\{Entrance, MajorEvents};
+use ILIAS\Plugin\Announcements\Frontend\ViewModifier;
+use ILIAS\Plugin\Announcements\Frontend\ViewModifier\AnnouncementLandingPageList;
 
 /**
  * @author            Michael Jansen <mjansen@databay.de>
@@ -25,6 +27,9 @@ class ilAnnouncementsUIHookGUI extends ilUIHookPluginGUI
 
     /** @var \ilTemplate */
     protected $mainTemlate;
+
+    /** @var ViewModifier[]|null  */
+    protected static $modifiers = null;
 
     /**
      * ilAnnouncementsUIHookGUI constructor.
@@ -57,9 +62,7 @@ class ilAnnouncementsUIHookGUI extends ilUIHookPluginGUI
         $this->mainTemlate = $this->dic->ui()->mainTemplate();
 
         if ($this->actor->isAnonymous() || 0 === (int) $this->actor->getId()) {
-            $target = '&target=majorevents';
-
-            $this->ctrl->redirectToURL('login.php?cmd=force_login&client_id=' . CLIENT_ID . $target);
+            $this->ctrl->redirectToURL('login.php?cmd=force_login&client_id=' . CLIENT_ID);
         }
 
         $this->setPluginObject(ilAnnouncementsPlugin::getInstance());
@@ -105,111 +108,23 @@ class ilAnnouncementsUIHookGUI extends ilUIHookPluginGUI
                 );
                 return ['mode' => ilUIHookPluginGUI::REPLACE, 'html' => $correctUrl];
             }
-        } elseif ('Services/PersonalDesktop' === $a_comp && 'center_column' === $a_part) {
+        }
 
-            global $tpl;
+        if (isset($this->dic['tpl'])) {
+            if (null === self::$modifiers) {
+                self::$modifiers = [
+                    new AnnouncementLandingPageList($this, $this->dic)
+                ];
+            }
 
-            $tpl->addCss('Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/Announcements/templates/announcements.css');
-            $main_tpl = $this->plugin_object->getTemplate('tpl.main_template.html', true, true);
-            $main_tpl = $this->addNewsView($main_tpl);
-            return ['mode' => ilUIHookPluginGUI::PREPEND, 'html' => $main_tpl->get()];
+            foreach (self::$modifiers as $modifier) {
+                if ($modifier->shouldModifyHtml($a_comp, $a_part, $a_par)) {
+                    return $modifier->modifyHtml($a_comp, $a_part, $a_par);
+                }
+            }
         }
 
         return $unmodified;
-    }
-
-    /**
-     * TODO: Move this to another class
-     * @param ilTemplate $main_tpl
-     * @return ilTemplate
-     */
-    protected function addNewsView($main_tpl)
-    {
-        global $DIC;
-
-        $settings = $DIC['plugin.announcements.settings'];
-
-        $news_entries = [
-            [
-                'title' => 'Hochschulsport 2019',
-                'author' => 6,
-                'published_date' => '22.07.2019',
-                'content' => 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Sed porttitor lectus nibh.'
-            ],
-            [
-                'title' => 'Ringvorlesung 2019',
-                'author' => 6,
-                'published_date' => '20.07.2019',
-                'content' => 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Sed porttitor lectus nibh.'
-            ],
-            [
-                'title' => 'Termine Prüfungsauschschuss',
-                'author' => 6,
-                'published_date' => '25.06.2019',
-                'content' => 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Sed porttitor lectus nibh.'
-            ],
-        ];
-
-        $main_tpl->setVariable('TITLE', $settings->getRssChannelTitle());
-
-        $subscribeRssModal = $DIC->ui()->factory()
-            ->modal()
-            ->roundtrip('', [])
-            ->withAsyncRenderUrl(
-                $this->ctrl->getLinkTargetByClass(
-                    [ilUIPluginRouterGUI::class, self::class],
-                    'Subscription.getRssModalContent',
-                    '', true, false
-                )
-            );
-
-        $rssModalTriggerButton = $DIC->ui()->factory()
-            ->button()
-            ->shy($this->plugin_object->txt('rss_subscription_btn_label'), '')
-            ->withOnClick(
-                $subscribeRssModal->getShowSignal()
-            );
-        $components = [
-            $subscribeRssModal,
-            $rssModalTriggerButton
-        ];
-
-        $main_tpl->setVariable('RSS_COMPONENT', $DIC->ui()->renderer()->render($components));
-
-        $subscribeRssRoomChangeModal = $DIC->ui()->factory()
-            ->modal()
-            ->roundtrip('', [])
-            ->withAsyncRenderUrl($this->ctrl->getLinkTargetByClass(
-                [ilUIPluginRouterGUI::class, self::class],
-                'Subscription.getRssRoomChangeModalContent',
-                '', true, false
-            ));
-
-        $subscribeRssRoomChangeModalModalTriggerButton = $DIC->ui()->factory()
-            ->button()
-            ->shy($this->plugin_object->txt('rss_subscription_room_change_btn_label'), '')
-            ->withOnClick(
-                $subscribeRssRoomChangeModal->getShowSignal()
-            );
-        $components = [
-            $subscribeRssRoomChangeModal,
-            $subscribeRssRoomChangeModalModalTriggerButton
-        ];
-
-        $main_tpl->setVariable('RSS_ROOM_CHANGE_COMPONENT', $DIC->ui()->renderer()->render($components));
-
-        foreach ($news_entries as $entry) {
-            $acc = new ilAccordionGUI();
-            $acc->setBehaviour(ilAccordionGUI::ALL_CLOSED);
-
-            $author = new ilObjUser($entry['author']);
-            $published_on = $entry['published_date'];
-            $header_action = '<span class="announcements_meta pull-right">' . $author->getPublicName() . ' | ' . $published_on . '</span>';
-            $acc->addItem($entry['title'] . $header_action, $entry['content']);
-            $main_tpl->setVariable('NEWS_ENTRY', $acc->getHTML());
-            $main_tpl->parseCurrentBlock();
-        }
-        return $main_tpl;
     }
 
     /**

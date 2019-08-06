@@ -1,19 +1,22 @@
-<?php declare(strict_types=1);
+<?php
 /* Copyright (c) 1998-2019 ILIAS open source, Extended GPL, see docs/LICENSE */
 
-namespace ILIAS\Plugin\Announcements\Frontend\Controller;
+namespace ILIAS\Plugin\Announcements\Frontend\ViewModifier;
 
 use ILIAS\DI\Container;
 use ILIAS\Plugin\Announcements\AccessControl\AccessHandler;
 use ILIAS\Plugin\Announcements\Entry\Service;
+use ILIAS\Plugin\Announcements\Frontend\ViewModifier;
 use ILIAS\UI\Factory;
 use ILIAS\UI\Renderer;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * @author Michael Jansen <mjansen@databay.de>
+ * Interface ViewModifier
+ * @package ILIAS\Plugin\Announcements\Frontend\ViewModifier
+ * @author  Michael Jansen <mjansen@databay.de>
  */
-abstract class Base
+abstract class Base implements ViewModifier
 {
     /** @var ServerRequestInterface */
     protected $request;
@@ -43,6 +46,8 @@ abstract class Base
     protected $lng;
     /** @var \ilAnnouncementsUIHookGUI */
     public $coreController;
+    /** @var \ilTemplate */
+    protected $mainTemlate;
 
     /**
      * Base constructor.
@@ -55,6 +60,7 @@ abstract class Base
         $this->dic = $dic;
 
         $this->request = $dic->http()->request();
+        $this->mainTemlate = $dic->ui()->mainTemplate();
         $this->ctrl = $dic->ctrl();
         $this->lng = $dic->language();
         $this->tpl = $dic->ui()->mainTemplate();
@@ -66,31 +72,7 @@ abstract class Base
         $this->accessHandler = $dic['plugin.announcements.accessHandler'];
         $this->coreAccessHandler = $dic->access();
         $this->errorHandler = $dic['ilErr'];
-
-        $this->init();
     }
-
-    /**
-     *
-     */
-    protected function init()
-    {
-    }
-
-    /**
-     * @param string $name
-     * @param array $arguments
-     * @return mixed
-     */
-    final public function __call(string $name, array $arguments)
-    {
-        return call_user_func_array([$this, $this->getDefaultCommand()], []);
-    }
-
-    /**
-     * @return string
-     */
-    abstract public function getDefaultCommand() : string;
 
     /**
      * @return \ilAnnouncementsUIHookGUI
@@ -106,14 +88,5 @@ abstract class Base
     public function getDic() : Container
     {
         return $this->dic;
-    }
-
-    /**
-     * @return string
-     * @throws \ReflectionException
-     */
-    final public function getControllerName() : string
-    {
-        return (new \ReflectionClass($this))->getShortName();
     }
 }
