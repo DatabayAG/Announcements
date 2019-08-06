@@ -88,21 +88,22 @@ class ilAnnouncementsUIHookGUI extends ilUIHookPluginGUI
      */
 	protected function addNewsView($main_tpl){
         $settings = $GLOBALS['DIC']['plugin.announcements.settings'];
+     
         $news_entries = [
             ['title' => 'Hochschulsport 2019', 'author' => 6 , 'published_date' => '22.07.2019' , 'content' => 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Sed porttitor lectus nibh.'],
             ['title' => 'Ringvorlesung 2019', 'author' => 453 , 'published_date' => '20.07.2019' , 'content' => 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Sed porttitor lectus nibh.'],
-            ['title' => 'Termine Prüfungsauschschuss', 'author' => 6 , 'published_date' => '22.06.2019' ,  'content' => 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Sed porttitor lectus nibh.'],
+            ['title' => 'Termine Prüfungsauschschuss', 'author' => 6 , 'published_date' => '25.06.2019' ,  'content' => 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Sed porttitor lectus nibh.'],
         ];
-
-
+        
         $main_tpl->setVariable('TITLE',  $settings->getRssChannelTitle());
 
         foreach($news_entries as $entry){
             $acc = new ilAccordionGUI();
             $acc->setBehaviour(ilAccordionGUI::ALL_CLOSED);
-            $author = new ilObjUser($entry['author']);
-
-            $header_action = '<span class="announcements_meta pull-right">' . $author->getPublicName() . ' | 22.06.2018</span>';
+            
+            $author       = new ilObjUser($entry['author']);
+            $published_on = $entry['published_date'];
+            $header_action = '<span class="announcements_meta pull-right">' . $author->getPublicName() . ' | ' . $published_on . '</span>';
             $acc->addItem($entry['title'] . $header_action, $entry['content']);
             $main_tpl->setVariable('NEWS_ENTRY',  $acc->getHTML());
             $main_tpl->parseCurrentBlock();
