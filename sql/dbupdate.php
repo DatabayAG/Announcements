@@ -130,3 +130,20 @@ if ($ilDB->tableExists('pl_announcements')) {
     }
 }
 ?>
+<#5>
+<?php
+if ($ilDB->tableExists('pl_announcements')) {
+    if (!$ilDB->tableColumnExists('pl_announcements', 'is_sticky')) {
+        $ilDB->addTableColumn(
+            'pl_announcements',
+            'is_sticky',
+            [
+                'type'    => 'integer',
+                'length'    => 1,
+                'notnull' => true,
+                'default' => 0
+            ]
+        );
+    }
+}
+?>
