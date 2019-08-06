@@ -76,14 +76,23 @@ class ilAnnouncementsUIHookGUI extends ilUIHookPluginGUI
             /**
              * @var $main_tpl ilTemplate
              */
+            $news_entries = [
+                ['title' => 'Hochschulsport 2019', 'author' => 6 , 'published_date' => '22.07.2019' , 'content' => 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Sed porttitor lectus nibh.'],
+                ['title' => 'Ringvorlesung 2019', 'author' => 123 , 'published_date' => '20.07.2019' , 'content' => 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Sed porttitor lectus nibh.'],
+                ['title' => 'Termine Prüfungsauschschuss', 'author' => 6 , 'published_date' => '22.06.2019' ,  'content' => 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Sed porttitor lectus nibh.'],
+            ];
             $main_tpl = $this->plugin_object->getTemplate('tpl.main_template.html', true, true);
             $main_tpl->setVariable('TITLE',  $settings->getRssChannelTitle());
-            $main_tpl->setVariable('NEWS_ENTRY_TITLE', 'Hochschulsport 2019');
-            $main_tpl->setVariable('NEWS_ENTRY_TEXT', 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Sed porttitor lectus nibh.');
-            $main_tpl->parseCurrentBlock();          
-            $main_tpl->setVariable('NEWS_ENTRY_TITLE', 'Hochschulsport 2019');
-            $main_tpl->setVariable('NEWS_ENTRY_TEXT', 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Sed porttitor lectus nibh.');
-            $main_tpl->parseCurrentBlock();           
+  
+            foreach($news_entries as $entry){
+                $acc = new ilAccordionGUI();
+                $acc->setBehaviour(ilAccordionGUI::ALL_CLOSED);
+                $header_action = '<span class="announcements_meta pull-right">Anton Meyer | 22.06.2018</span>';
+                $acc->addItem($entry['title'] . $header_action, $entry['content']);
+                $main_tpl->setVariable('NEWS_ENTRY',  $acc->getHTML());
+                $main_tpl->parseCurrentBlock();
+            }
+           
             return ['mode' => ilUIHookPluginGUI::PREPEND, 'html' => $main_tpl->get()];
         }
 
