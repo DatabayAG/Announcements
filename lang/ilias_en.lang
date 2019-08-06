@@ -7,3 +7,11 @@ acl_role_reader#:#Reader
 acl_role_creator#:#Creator
 acl_role_manager#:#Manager
 acl_role_mapping_please_assign_groles#:#Bitte weisen Sie der Rolle ein oder mehrere globale ILIAS-Rollen zu.
+rss_subscription_btn_label#:#RSS
+rss_subscription_room_change_btn_label#:#RSS Room Changes
+rss_subscription_title#:#RSS Feed Subscription
+rss_subscription_info#:#Please use the following address to access our RSS feed from other applications. You can copy and paste this into any RSS client.
+rss_subscription_room_change_title#:#RSS Feed Subscription for Room Changes
+rss_subscription_room_change_info#:#Please use the following address to access our RSS feed from other applications. You can copy and paste this into any RSS client.
+label_rss_url#:#RSS-URL
+label_rss_room_change_url#:#RSS-URL
