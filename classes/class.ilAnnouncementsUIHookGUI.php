@@ -115,25 +115,42 @@ class ilAnnouncementsUIHookGUI extends ilUIHookPluginGUI
             return ['mode' => ilUIHookPluginGUI::PREPEND, 'html' => $main_tpl->get()];
         }
 
-		return $unmodified;
-	}
+        return $unmodified;
+    }
 
     /**
+     * TODO: Move this to another class
      * @param ilTemplate $main_tpl
      * @return ilTemplate
      */
-    protected function addNewsView($main_tpl){
-        $settings = $GLOBALS['DIC']['plugin.announcements.settings'];
+    protected function addNewsView($main_tpl)
+    {
+        global $DIC;
+
+        $settings = $DIC['plugin.announcements.settings'];
 
         $news_entries = [
-            ['title' => 'Hochschulsport 2019', 'author' => 6 , 'published_date' => '22.07.2019' , 'content' => 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Sed porttitor lectus nibh.'],
-            ['title' => 'Ringvorlesung 2019', 'author' => 453 , 'published_date' => '20.07.2019' , 'content' => 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Sed porttitor lectus nibh.'],
-            ['title' => 'Termine Prüfungsauschschuss', 'author' => 6 , 'published_date' => '25.06.2019' ,  'content' => 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Sed porttitor lectus nibh.'],
+            [
+                'title' => 'Hochschulsport 2019',
+                'author' => 6,
+                'published_date' => '22.07.2019',
+                'content' => 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Sed porttitor lectus nibh.'
+            ],
+            [
+                'title' => 'Ringvorlesung 2019',
+                'author' => 6,
+                'published_date' => '20.07.2019',
+                'content' => 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Sed porttitor lectus nibh.'
+            ],
+            [
+                'title' => 'Termine Prüfungsauschschuss',
+                'author' => 6,
+                'published_date' => '25.06.2019',
+                'content' => 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Sed porttitor lectus nibh.'
+            ],
         ];
 
-        $main_tpl->setVariable('TITLE',  $settings->getRssChannelTitle());
-
-        global $DIC;
+        $main_tpl->setVariable('TITLE', $settings->getRssChannelTitle());
 
         $subscribeRssModal = $DIC->ui()->factory()
             ->modal()
@@ -181,15 +198,15 @@ class ilAnnouncementsUIHookGUI extends ilUIHookPluginGUI
 
         $main_tpl->setVariable('RSS_ROOM_CHANGE_COMPONENT', $DIC->ui()->renderer()->render($components));
 
-        foreach($news_entries as $entry){
+        foreach ($news_entries as $entry) {
             $acc = new ilAccordionGUI();
             $acc->setBehaviour(ilAccordionGUI::ALL_CLOSED);
 
-            $author       = new ilObjUser($entry['author']);
+            $author = new ilObjUser($entry['author']);
             $published_on = $entry['published_date'];
             $header_action = '<span class="announcements_meta pull-right">' . $author->getPublicName() . ' | ' . $published_on . '</span>';
             $acc->addItem($entry['title'] . $header_action, $entry['content']);
-            $main_tpl->setVariable('NEWS_ENTRY',  $acc->getHTML());
+            $main_tpl->setVariable('NEWS_ENTRY', $acc->getHTML());
             $main_tpl->parseCurrentBlock();
         }
         return $main_tpl;
