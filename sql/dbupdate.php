@@ -113,3 +113,20 @@ if ($ilDB->tableExists('pl_announcements')) {
 	}
 }
 ?>
+<#4>
+<?php
+if ($ilDB->tableExists('pl_announcements')) {
+    if (!$ilDB->tableColumnExists('pl_announcements', 'is_room_change')) {
+        $ilDB->addTableColumn(
+            'pl_announcements',
+            'is_room_change',
+            [
+                'type'    => 'integer',
+                'length'    => 1,
+                'notnull' => true,
+                'default' => 0
+            ]
+        );
+    }
+}
+?>

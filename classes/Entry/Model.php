@@ -121,6 +121,15 @@ class Model extends \ActiveRecord
 	 */
 	protected $expiration_timezone = '';
 
+    /**
+     * @var int
+     * @con_has_field   true
+     * @con_fieldtype   integer
+     * @con_is_notnull  true
+     * @con_length      1
+     */
+    protected $is_room_change = 0;
+
 	/**
 	 * @var string
 	 * @con_has_field   true
