@@ -1,11 +1,38 @@
-.announcements{
+.announcements_accordion .il_VAccordionHead{
 	color:#932136;
 	font-weight: bolder;
-	padding:0.8em;
-	margin-bottom:0.8em;
-	background-color: white;
+	background-color: #e5e5e5;
 }
-.announcements_accordion_body{
+.announcements_accordion .il_VAccordionContent{
 	color: black;
 	font-weight: normal;
+	background-color: white;
+	padding: 0.8em;
+}
+.announcements_accordion .il_VAccordionContainer{
+	background-color: white;
+	margin-bottom: 0px; 
+	padding-bottom: 10px;
+}
+.announcements_accordion .announcements_meta{
+	float: right;
+	color: #8d8d8d;
+	font-weight: normal;
+	font-size: small;
+}
+.announcements_head{
+	background-color: white;
+	padding: 1em;
+}
+.announcements_accordion .il_VAccordionContentDef {
+	border: 3px solid #e5e5e5;
+}
+.announcements{
+	margin: 1em;
+	margin-bottom: 0em;
+	margin-top: 0em;
+	background-color: white;
+}
+.announcements_layer{
+	background-color: white;
 }
