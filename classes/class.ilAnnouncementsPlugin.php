@@ -7,7 +7,8 @@ use ILIAS\Plugin\Announcements\AccessControl\Acl\Impl;
 use ILIAS\Plugin\Announcements\AccessControl\Acl\Resource\GenericResource;
 use ILIAS\Plugin\Announcements\AccessControl\Acl\Role\GenericRole;
 use ILIAS\Plugin\Announcements\AccessControl\Acl\Role\Registry;
-use ILIAS\Plugin\Announcements\AccessControl\RoleBasedAccessHandler;
+use ILIAS\Plugin\Announcements\AccessControl\Handler\Cached;
+use ILIAS\Plugin\Announcements\AccessControl\Handler\RoleBased;
 use ILIAS\Plugin\Announcements\Administration\GeneralSettings\Settings;
 use ILIAS\Plugin\Announcements\Entry\Service;
 
@@ -61,11 +62,13 @@ class ilAnnouncementsPlugin extends ilUserInterfaceHookPlugin
             self::$initialized = true;
 
             $GLOBALS['DIC']['plugin.announcements.accessHandler'] = function (Container $c) {
-                return new RoleBasedAccessHandler(
-                    $c->user(),
-                    $c['plugin.announcements.settings'],
-                    $c->rbac()->review(),
-                    $c['plugin.announcements.acl']
+                return new Cached(
+                    new RoleBased(
+                        $c->user(),
+                        $c['plugin.announcements.settings'],
+                        $c->rbac()->review(),
+                        $c['plugin.announcements.acl']
+                    )
                 );
             };
 

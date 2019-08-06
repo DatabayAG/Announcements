@@ -1,17 +1,18 @@
 <?php declare(strict_types=1);
 /* Copyright (c) 1998-2019 ILIAS open source, Extended GPL, see docs/LICENSE */
 
-namespace ILIAS\Plugin\Announcements\AccessControl;
+namespace ILIAS\Plugin\Announcements\AccessControl\Handler;
 
+use ILIAS\Plugin\Announcements\AccessControl\AccessHandler;
 use ILIAS\Plugin\Announcements\Administration\GeneralSettings\Settings;
 use ILIAS\Plugin\Announcements\Entry\Model;
 
 /**
- * Class RoleBasedAccessHandler
- * @package ILIAS\Plugin\Announcements\AccessControl
+ * Class RoleBased
+ * @package ILIAS\Plugin\Announcements\AccessControl\Handler
  * @author Michael Jansen <mjansen@databay.de>
  */
-class RoleBasedAccessHandler implements AccessHandler
+class RoleBased implements AccessHandler
 {
 	/** @var \ilObjUser */
 	private $actor;
