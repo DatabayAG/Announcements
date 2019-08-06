@@ -15,152 +15,159 @@ use ILIAS\Plugin\Announcements\Entry\Exception\CommandLogic;
  */
 class Service
 {
-	/** @var AccessHandler */
-	private $accessHandler;
+    /** @var AccessHandler */
+    private $accessHandler;
 
-	/** @var \ilDBInterface */
-	private $db;
+    /** @var \ilDBInterface */
+    private $db;
 
-	/** @var \ilObjUser */
-	private $actor;
+    /** @var \ilObjUser */
+    private $actor;
 
-	/**
-	 * Service constructor.
-	 * @param \ilObjUser     $actor
-	 * @param \ilDBInterface $db
-	 * @param AccessHandler  $accessHandler
-	 */
-	public function __construct(
-		\ilObjUser $actor,
-		\ilDBInterface $db,
-		AccessHandler $accessHandler
-		
-	) {
-		$this->actor = $actor;
-		$this->db = $db;
-		$this->accessHandler = $accessHandler;
-	}
+    /**
+     * Service constructor.
+     * @param \ilObjUser $actor
+     * @param \ilDBInterface $db
+     * @param AccessHandler $accessHandler
+     */
+    public function __construct(
+        \ilObjUser $actor,
+        \ilDBInterface $db,
+        AccessHandler $accessHandler
 
-	/**
-	 * @param \ilObjUser $actor
-	 * @return Service
-	 */
-	public function withActor(\ilObjUser $actor) : self
-	{
-		$clone = clone $this;
-		$clone->actor = $actor;
-		$clone->accessHandler = $this->accessHandler->withActor($actor); 
+    ) {
+        $this->actor = $actor;
+        $this->db = $db;
+        $this->accessHandler = $accessHandler;
+    }
 
-		return $clone;
-	}
+    /**
+     * @param \ilObjUser $actor
+     * @return Service
+     */
+    public function withActor(\ilObjUser $actor) : self
+    {
+        $clone = clone $this;
+        $clone->actor = $actor;
+        $clone->accessHandler = $this->accessHandler->withActor($actor);
 
-	/**
-	 * @param Model $entry
-	 * @throws PermissionDenied
-	 * @throws CommandLogic
-	 */
-	public function createEntry(Model $entry)
-	{
-		if (!$this->accessHandler->mayCreateEntries()) {
-			throw new PermissionDenied('No permission to create entry!');
-		}
+        return $clone;
+    }
 
-		if ($entry->getId()) {
-			throw new CommandLogic('An entry with id cannot be created!');
-		}
+    /**
+     * @param Model $entry
+     * @throws PermissionDenied
+     * @throws CommandLogic
+     */
+    public function createEntry(Model $entry)
+    {
+        if (!$this->accessHandler->mayCreateEntries()) {
+            throw new PermissionDenied('No permission to create entry!');
+        }
 
-		$entry->setCreatedTs(time());
-		$entry->setCreatorUsrId($this->actor->getId());
+        if ($entry->getId()) {
+            throw new CommandLogic('An entry with id cannot be created!');
+        }
 
-		$entry->store();
-	}
+        $entry->setCreatedTs(time());
+        $entry->setCreatorUsrId($this->actor->getId());
 
-	/**
-	 * @param Model $entry
-	 * @throws PermissionDenied
-	 * @throws CommandLogic
-	 * @throws NotFound
-	 */
-	public function modifyEntry(Model $entry)
-	{
-		if (!$this->accessHandler->mayEditEntry($entry)) {
-			throw new PermissionDenied('No permission to edit entry!');
-		}
+        $entry->store();
+    }
 
-		if (!$entry->getId()) {
-			throw new CommandLogic('An entry without id cannot be modified!');
-		}
+    /**
+     * @param Model $entry
+     * @throws PermissionDenied
+     * @throws CommandLogic
+     * @throws NotFound
+     */
+    public function modifyEntry(Model $entry)
+    {
+        if (!$this->accessHandler->mayEditEntry($entry)) {
+            throw new PermissionDenied('No permission to edit entry!');
+        }
 
-		try {
-			$entry::findOrFail($entry->getId());
-		} catch (\arException $e) { 
-			throw new NotFound($e->getMessage());
-		}
+        if (!$entry->getId()) {
+            throw new CommandLogic('An entry without id cannot be modified!');
+        }
 
-		$entry->setLastModifiedTs(time());
-		$entry->setLastModifierUsrId($this->actor->getId());
-		$entry->store();
-	}
+        try {
+            $entry::findOrFail($entry->getId());
+        } catch (\arException $e) {
+            throw new NotFound($e->getMessage());
+        }
 
-	/**
-	 * @param Model $entry
-	 * @throws PermissionDenied
-	 * @throws CommandLogic
-	 * @throws NotFound
-	 */
-	public function deleteEntry(Model $entry)
-	{
-		if (!$this->accessHandler->mayDeleteEntry($entry)) {
-			throw new PermissionDenied('No permission to delete entry!');
-		}
+        $entry->setLastModifiedTs(time());
+        $entry->setLastModifierUsrId($this->actor->getId());
+        $entry->store();
+    }
 
-		if (!$entry->getId()) {
-			throw new CommandLogic('An entry without id cannot be deleted!');
-		}
+    /**
+     * @param Model $entry
+     * @throws PermissionDenied
+     * @throws CommandLogic
+     * @throws NotFound
+     */
+    public function deleteEntry(Model $entry)
+    {
+        if (!$this->accessHandler->mayDeleteEntry($entry)) {
+            throw new PermissionDenied('No permission to delete entry!');
+        }
 
-		try {
-			$entry::findOrFail($entry->getId());
-		} catch (\arException $e) {
-			throw new NotFound($e->getMessage());
-		}
+        if (!$entry->getId()) {
+            throw new CommandLogic('An entry without id cannot be deleted!');
+        }
 
-		$entry->delete();
-	}
+        try {
+            $entry::findOrFail($entry->getId());
+        } catch (\arException $e) {
+            throw new NotFound($e->getMessage());
+        }
 
-	/**
-	 * @return Model[]
-	 * @throws \arException
-	 * @throws PermissionDenied
-	 */
-	public function findAllValid() : array
-	{
-		if (!$this->accessHandler->mayReadEntries()) {
-			throw new PermissionDenied('No permission to read entries!');
-		}
+        $entry->delete();
+    }
 
-		$effectiveCondition = [];
-		$runtimeConditions = [];
+    /**
+     * @param bool $onlyRoomChangeRelated
+     * @return Model[]
+     * @throws PermissionDenied
+     * @throws \arException
+     */
+    public function findAllValid($onlyRoomChangeRelated = false) : array
+    {
+        if (!$this->accessHandler->mayReadEntries()) {
+            throw new PermissionDenied('No permission to read entries!');
+        }
 
-		if (!$this->accessHandler->mayReadUnpublishedEntries()) {
-			$runtimeConditions[] = '(' . implode(' OR ', [
-				'publish_ts >= ' . $this->db->quote(time(), 'integer'),
-				'creator_usr_id = ' . $this->db->quote($this->actor->getId(), 'integer'),
-			]) . ')';
-		}
+        $effectiveCondition = [];
+        $runtimeConditions = [];
 
-		if (!$this->accessHandler->mayReadExpiredEntries()) {
-			$runtimeConditions[] = '(' . implode(' OR ', [
-				'expiration_ts <= ' . $this->db->quote(time(), 'integer'),
-				'creator_usr_id = ' . $this->db->quote($this->actor->getId(), 'integer'),
-			]) . ')';
-		}
-		
-		if (count($runtimeConditions) > 0) {
-			$effectiveCondition = implode(' AND ', $runtimeConditions); 
-		}
+        if (!$this->accessHandler->mayReadUnpublishedEntries()) {
+            $runtimeConditions[] = '(' . implode(' OR ', [
+                'publish_ts >= ' . $this->db->quote(time(), 'integer'),
+                'creator_usr_id = ' . $this->db->quote($this->actor->getId(), 'integer'),
+            ]) . ')';
+        }
 
-		$list = Model::where($effectiveCondition)->orderBy('publish_ts', 'DESC');
+        if (!$this->accessHandler->mayReadExpiredEntries()) {
+            $runtimeConditions[] = '(' . implode(' OR ', [
+                'expiration_ts <= ' . $this->db->quote(time(), 'integer'),
+                'creator_usr_id = ' . $this->db->quote($this->actor->getId(), 'integer'),
+            ]) . ')';
+        }
 
-		return $list->get();
-	}
+        if ($onlyRoomChangeRelated) {
+            $runtimeConditions[] = '(' . implode(' OR ', [
+                'is_room_change <= ' . $this->db->quote(1, 'integer'),
+            ]) . ')';
+        }
+
+        if (count($runtimeConditions) > 0) {
+            $effectiveCondition = implode(' AND ', $runtimeConditions);
+        }
+
+        $list = Model::where($effectiveCondition)->orderBy('publish_ts', 'DESC');
+
+        return $list->get();
+    }
 }

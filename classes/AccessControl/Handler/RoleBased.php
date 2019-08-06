@@ -4,6 +4,7 @@
 namespace ILIAS\Plugin\Announcements\AccessControl\Handler;
 
 use ILIAS\Plugin\Announcements\AccessControl\AccessHandler;
+use ILIAS\Plugin\Announcements\AccessControl\Acl;
 use ILIAS\Plugin\Announcements\Administration\GeneralSettings\Settings;
 use ILIAS\Plugin\Announcements\Entry\Model;
 
