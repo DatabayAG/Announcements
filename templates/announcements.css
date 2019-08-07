@@ -2,6 +2,7 @@
 	color:#932136;
 	font-weight: bolder;
 	background-color: #e5e5e5;
+	padding-top: 0.5em;
 }
 .announcements_accordion .il_VAccordionContent{
 	color: black;
@@ -21,8 +22,10 @@
 	font-size: small;
 }
 .announcements_head{
+	color:#932136;
 	background-color: white;
 	padding: 1em;
+	font-weight: 600;
 }
 .announcements_accordion .il_VAccordionContentDef {
 	border: 3px solid #e5e5e5;
