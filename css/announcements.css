@@ -39,3 +39,21 @@
 .announcements_layer{
 	background-color: white;
 }
+.announcements_rss, .announcements_rooms_rss{
+	width:20px;
+	height:20px;
+	background-repeat: no-repeat;
+
+}
+.announcements_head button{
+	font-size: 0 !important;
+	background-repeat: no-repeat;
+	width:20px;
+	height:20px;
+}
+.announcements_rss{
+	background-image: url("../templates/images/rss_1.svg");
+}
+.announcements_rooms_rss{
+	background-image: url("../templates/images/rss_2.svg");
+}
