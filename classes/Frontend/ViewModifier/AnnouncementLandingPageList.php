@@ -74,6 +74,18 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
                 )
             )
         );
+        $listTemplate->setVariable(
+            'CREATE_NEWS',
+            $this->uiRenderer->render(
+                $this->uiFactory->link()->standard(
+                    '', 
+                    $this->ctrl->getLinkTargetByClass(
+                        [\ilUIPluginRouterGUI::class, get_class($this->getCoreController())],
+                        'News.createNews'
+                    )
+                )
+            )
+        );
 
         foreach ($news_entries as $entry) {
             $acc = new \ilAccordionGUI();

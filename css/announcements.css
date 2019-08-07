@@ -39,7 +39,7 @@
 .announcements_layer{
 	background-color: white;
 }
-.announcements_rss, .announcements_rooms_rss{
+.announcements_rss, .announcements_rooms_rss, .announcements_create_news{
 	width:20px;
 	height:20px;
 	background-repeat: no-repeat;
@@ -56,4 +56,12 @@
 }
 .announcements_rooms_rss{
 	background-image: url("../templates/images/rss_2.svg");
+}
+.announcements_create_news{
+	background-image: url("../templates/images/plus.svg");
+}
+.announcements_create_news > a{
+	display: block;
+	width: 100%;
+	height: 100%;
 }
