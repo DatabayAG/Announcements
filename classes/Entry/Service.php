@@ -180,6 +180,19 @@ class Service
     }
 
     /**
+     * @return string
+     * @throws PermissionDenied
+     */
+    public function getAuthenticationToken() : string 
+    {
+        if (!$this->accessHandler->mayReadEntries()) {
+            throw new PermissionDenied('No permission to read entries!');
+        }
+        
+        return $this->actor::_lookupFeedHash($this->actor->getId(), true);
+    }
+
+    /**
      * @param bool $onlyRoomChangeRelated
      * @return Model[]
      * @throws PermissionDenied

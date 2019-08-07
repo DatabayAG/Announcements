@@ -7,3 +7,11 @@ acl_role_reader#:#Ankündigungsleser
 acl_role_creator#:#Ankündigungsersteller
 acl_role_manager#:#Ankündigungsmanager
 acl_role_mapping_please_assign_groles#:#Bitte weisen Sie der Rolle ein oder mehrere globale ILIAS-Rollen zu.
+rss_subscription_btn_label#:#RSS
+rss_subscription_room_change_btn_label#:#RSS Raumänderungen
+rss_subscription_info#:#RSS-Feed abonnieren
+rss_subscription_room_change_info#:#Verwenden Sie die folgende Adresse, um den RSS-Feed zu abonnieren. Sie können diese Adresse kopieren und in einem beliebigen RSS-Client nutzen.
+rss_subscription_room_change_title#:#RSS-Feed für Raumänderungen abonnieren
+rss_subscription_room_change_info#:#Verwenden Sie die folgende Adresse, um den RSS-Feed zu abonnieren. Sie können diese Adresse kopieren und in einem beliebigen RSS-Client nutzen.
+label_rss_url#:#RSS-URL
+label_rss_room_change_url#:#RSS-URL
