@@ -97,6 +97,17 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
      */
     private function getRssSubscriptionModalTriggerComponents(string $label, string $command) : array
     {
+        global $DIC;
+        $f = $DIC->ui()->factory();
+
+        $rss_1 = 'Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/Announcements/templates/images/rss_1.svg';
+        $rss_2 = 'Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/Announcements/templates/images/rss_2.svg';
+
+        $ico = $f->icon()->custom($rss_1, $label);
+        if($command === "getRssRoomChangeModalContent"){
+            $ico = $f->icon()->custom($rss_2, $label);
+        }
+        
         $modal = $this->uiFactory
             ->modal()
             ->roundtrip('', [])
@@ -115,7 +126,7 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
 
         $components = [
             $modal,
-            $triggerButton
+            $triggerButton, $ico
         ];
 
         return $components;
