@@ -17,7 +17,7 @@ label_rss_url#:#RSS-URL
 label_rss_room_change_url#:#RSS-URL
 create_news#:#Create News
 news_title_info#:#The visible title
-news_details_info#:#The toggable details
+news_content_info#:#The toggable details
 publish_date#:#Publish date
 news_publish_date_info#:#Date since the news is shown
 expiration_date#:#Expiration date

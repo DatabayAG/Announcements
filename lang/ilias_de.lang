@@ -17,7 +17,7 @@ label_rss_url#:#RSS-URL
 label_rss_room_change_url#:#RSS-URL
 create_news#:#Neuigkeit erstellen
 news_title_info#:#Angezeigter Titel
-news_details_info#:#Details die beim aktivieren angezeigt werden
+news_content_info#:#Details die beim aktivieren angezeigt werden
 publish_date#:#Veröffentlichungsdatum
 news_publish_date_info#:#Datum ab dem die Ankündigung gezeigt wird
 expiration_date#:#Verfallsdatum

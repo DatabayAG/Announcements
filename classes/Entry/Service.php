@@ -235,4 +235,17 @@ class Service
 
         return $list->get();
     }
+
+    /**
+     * @param int $id
+     * @return Model
+     */
+    public function findById(int $id) : Model
+    {
+
+        $list = Model::where('id = '.$this->db->quote($id, 'integer'));
+
+        return $list->first();
+    }
+
 }

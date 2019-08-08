@@ -3,6 +3,7 @@
 
 namespace ILIAS\Plugin\Announcements\Frontend\ViewModifier;
 
+use ILIAS\Plugin\Announcements\Entry\Model;
 use ILIAS\Plugin\Announcements\Frontend\ViewModifier;
 use ILIAS\UI\Component\Component;
 
@@ -26,33 +27,13 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
 
     /**
      * @inheritDoc
+     * @throws \ilDateTimeException
      */
     public function modifyHtml(string $component, string $part, array $parameters) : array
     {
         $this->mainTemlate->addCss($this->getCoreController()->getPluginObject()->getDirectory() . '/css/announcements.css');
 
         $listTemplate = $this->getCoreController()->getPluginObject()->getTemplate('tpl.landing_page_list.html', true, true);
-
-        $news_entries = [
-            [
-                'title' => 'Hochschulsport 2019',
-                'author' => 6,
-                'published_date' => '22.07.2019',
-                'content' => 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Sed porttitor lectus nibh.'
-            ],
-            [
-                'title' => 'Ringvorlesung 2019',
-                'author' => 6,
-                'published_date' => '20.07.2019',
-                'content' => 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Sed porttitor lectus nibh.'
-            ],
-            [
-                'title' => 'Termine Prüfungsauschschuss',
-                'author' => 6,
-                'published_date' => '25.06.2019',
-                'content' => 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Sed porttitor lectus nibh.'
-            ],
-        ];
 
         $listTemplate->setVariable('TITLE', 'Dummy News');
 
@@ -81,25 +62,45 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
                     '', 
                     $this->ctrl->getLinkTargetByClass(
                         [\ilUIPluginRouterGUI::class, get_class($this->getCoreController())],
-                        'News.createNews'
+                        'News.create'
                     )
                 )
             )
         );
 
-        foreach ($news_entries as $entry) {
+        $repository = new \ActiveRecordList(new Model());
+        foreach ($repository->get() as $object) {
             $acc = new \ilAccordionGUI();
-            $acc->setBehaviour(\ilAccordionGUI::ALL_CLOSED);
+            $author = new \ilObjUser($object->getCreatorUsrId());
+            $published = new \ilDateTime($object->getPublishTs(), IL_CAL_UNIX, $this->user->getTimeZone());
 
-            $author = new \ilObjUser($entry['author']);
-            $published_on = $entry['published_date'];
-            $header_action = '<span class="announcements_meta pull-right">' . $author->getPublicName() . ' | ' . $published_on . '</span>';
-            $acc->addItem($entry['title'] . $header_action, $entry['content']);
+            $edit = $this->uiRenderer->render(
+                $this->uiFactory->link()->standard(
+                    '',
+                    $this->ctrl->getLinkTargetByClass(
+                        [\ilUIPluginRouterGUI::class, get_class($this->getCoreController())],
+                        'News.update'
+                    ) . '&id=' . $object->getId()
+                )
+            );
+            $header_action =
+                $edit .
+                '<span class="announcements_meta pull-right">' .
+                $author->getPublicName() . ' | ' . $published .
+                '</span>';
+
+            $acc->addItem($object->getTitle() . $header_action, $object->getContent());
             $listTemplate->setVariable('NEWS_ENTRY', $acc->getHTML());
             $listTemplate->parseCurrentBlock();
         }
 
-        return ['mode' => \ilUIHookPluginGUI::PREPEND, 'html' => $listTemplate->get()];
+        $content = [];
+        if (isset($this->request->getQueryParams()['saved'])) {
+            $content[] = $this->uiFactory->messageBox()->success($this->lng->txt('saved_successfully'));
+        }
+        $content[] = $this->uiFactory->legacy($listTemplate->get());
+
+        return ['mode' => \ilUIHookPluginGUI::PREPEND, 'html' => $this->uiRenderer->render($content)];
     }
 
     /**
