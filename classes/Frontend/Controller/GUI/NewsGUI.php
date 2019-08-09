@@ -82,7 +82,7 @@ class NewsGUI extends \ilPropertyFormGUI
         $input = new \ilCheckboxInputGUI($this->translate('fixed'),'fixed');
         $input->setInfo($this->translate('news_fixed_info'));
         if($model && $model->getFixed()){
-            $input->setValue($model->getFixed());
+            $input->setChecked(true);
         }
         $this->addItem($input);
 
@@ -94,15 +94,15 @@ class NewsGUI extends \ilPropertyFormGUI
         }
         $this->addItem($input);
 
-        $this->addCommandButton("save", $this->translate("save"));
-        $this->addCommandButton("cancle", $this->translate("cancel"));
+        $this->addCommandButton("submit", $this->translate("save"));
+        $this->addCommandButton("cancel", $this->translate("cancel"));
 
         return $this;
     }
     
     public function translate(string $key, bool $forceGlobal = false){
         global $DIC;
-        $translation = $DIC->language()->txt($this->plugin->getPrefix().'_'.$key);
+        $translation = $this->plugin->txt($key);
         if($forceGlobal || $translation[0] == "-"){
             $translation = $DIC->language()->txt($key);
         }

@@ -209,21 +209,21 @@ class Service
 
         if (!$this->accessHandler->mayReadUnpublishedEntries()) {
             $runtimeConditions[] = '(' . implode(' OR ', [
-                'publish_ts >= ' . $this->db->quote(time(), 'integer'),
+                'publish_ts <= ' . $this->db->quote(time(), 'integer'),
                 'creator_usr_id = ' . $this->db->quote($this->actor->getId(), 'integer'),
             ]) . ')';
         }
 
         if (!$this->accessHandler->mayReadExpiredEntries()) {
             $runtimeConditions[] = '(' . implode(' OR ', [
-                'expiration_ts <= ' . $this->db->quote(time(), 'integer'),
+                'expiration_ts >= ' . $this->db->quote(time(), 'integer'),
                 'creator_usr_id = ' . $this->db->quote($this->actor->getId(), 'integer'),
             ]) . ')';
         }
 
         if ($onlyRoomChangeRelated) {
             $runtimeConditions[] = '(' . implode(' OR ', [
-                'is_room_change <= ' . $this->db->quote(1, 'integer'),
+                'category = ' . $this->db->quote(1, 'integer'),
             ]) . ')';
         }
 
@@ -231,8 +231,9 @@ class Service
             $effectiveCondition = implode(' AND ', $runtimeConditions);
         }
 
-        $list = Model::where($effectiveCondition)->orderBy('publish_ts', 'DESC');
+        $list = Model::where($effectiveCondition)->orderBy('fixed', 'DESC')->orderBy('publish_ts', 'DESC');
 
+        $list->get();
         return $list->get();
     }
 
@@ -245,6 +246,7 @@ class Service
 
         $list = Model::where('id = '.$this->db->quote($id, 'integer'));
 
+        $x = $list->first();
         return $list->first();
     }
 

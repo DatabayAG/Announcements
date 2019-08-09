@@ -61,7 +61,6 @@ abstract class Base
         $this->user = $dic->user();
         $this->uiRenderer = $dic->ui()->renderer();
         $this->uiFactory = $dic->ui()->factory();
-        $this->toolbar = $dic->toolbar();
         $this->service = $dic['plugin.announcements.service'];
         $this->accessHandler = $dic['plugin.announcements.accessHandler'];
         $this->coreAccessHandler = $dic->access();

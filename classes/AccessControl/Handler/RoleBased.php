@@ -93,6 +93,7 @@ class RoleBased implements AccessHandler
 	 */
 	public function mayEditEntry(Model $entry) : bool
 	{
+	    $x = $this->actor->getId();
 		return (
 			!$this->isActorAnonymous() &&
 			(

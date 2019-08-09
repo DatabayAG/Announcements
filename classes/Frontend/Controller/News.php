@@ -3,6 +3,7 @@
 
 namespace ILIAS\Plugin\Announcements\Frontend\Controller;
 
+use ILIAS\Plugin\Announcements\AccessControl\Exception\PermissionDenied;
 use ILIAS\Plugin\Announcements\Entry\Model;
 use ILIAS\Plugin\Announcements\Exception;
 use ILIAS\Plugin\Announcements\Frontend\Controller\GUI\NewsGUI;
@@ -21,12 +22,25 @@ class News extends Base
     protected $gui;
 
     /**
+     * @var string
+     */
+    protected $action;
+
+    /**
      * @inheritDoc
      */
     protected function init()
     {
+        if (!$this->accessHandler->mayReadEntries()) {
+            throw new PermissionDenied('No permission to read entries!');
+        }
+
         $this->gui = new NewsGUI($this->coreController->getPluginObject());
         $this->tpl->setTitle($this->lng->txt('news'));
+        $this->action = $this->ctrl->getLinkTargetByClass(
+            [\ilUIPluginRouterGUI::class, get_class($this->getCoreController())],
+            'News.submit'
+        );
     }
 
     /**
@@ -40,31 +54,41 @@ class News extends Base
 
     /**
      * @return string
+     * @throws \ilDateTimeException
      */
     public function createCmd() : string
     {
-        $action = $this->ctrl->getLinkTargetByClass(
-            [\ilUIPluginRouterGUI::class, get_class($this->getCoreController())],
-            'News.submit'
-        );
-
-        return $this->gui->initForm($action)->getHTML();
+        return $this->gui->initForm($this->action)->getHTML();
     }
 
     /**
      * @return string
+     * @throws \ilDateTimeException
      */
     public function updateCmd() : string
     {
-        $action = $this->ctrl->getLinkTargetByClass(
-            [\ilUIPluginRouterGUI::class, get_class($this->getCoreController())],
-            'News.submit'
-        );
-
         $id = (int) ($this->request->getQueryParams()['id'] ?? 0);
         $model = $this->service->findById($id);
 
-        return $this->gui->initForm($action, $model)->getHTML();
+        return $this->gui->initForm($this->action, $model)->getHTML();
+    }
+
+    /**
+     * @return string
+     * @throws PermissionDenied
+     */
+    public function deleteCmd() : string
+    {
+        $id = (int) ($this->request->getQueryParams()['id'] ?? 0);
+        $model = $this->service->findById($id);
+
+        try{
+            $this->service->deleteEntry($model);
+        }catch (PermissionDenied $e){
+            $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI&failed=1');
+        }
+
+        $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI&deleted=1');
     }
 
     /**
@@ -73,21 +97,19 @@ class News extends Base
      */
     public function submitCmd() : string
     {
-        $action = $this->ctrl->getLinkTargetByClass(
-            [\ilUIPluginRouterGUI::class, get_class($this->getCoreController())],
-            'News.submit'
-        );
+        if(isset($this->request->getParsedBody()['cmd']['cancel'])){
+            $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI');
+        }
 
-        $form = $this->gui->initForm($action);
+        $form = $this->gui->initForm($this->action);
         if ($form->checkInput()) {
-            $content = [];
-            try {
-                if ($form->getInput('id')) {
-                    $model = new Model($form->getInput('id'));
-                } else {
-                    $model = new Model();
-                }
 
+            if ($form->getInput('id')) {
+                $model = $this->service->findById((int) $form->getInput('id'));
+            } else {
+                $model = new Model();
+            }
+            try {
                 $model->setTitle($form->getInput('title'));
                 $model->setContent($form->getInput('content'));
                 if($form->getInput('publish_date')){
@@ -97,19 +119,22 @@ class News extends Base
                 $model->setPublishTimezone($this->user->getTimeZone());
                 if($form->getInput('expiration_date')) {
                     $date = new \DateTime($form->getInput('expiration_date'));
-                    $model->setExpirationhTs($date->getTimestamp());
+                    $model->setExpirationTs($date->getTimestamp());
                 }
                 $model->setExpirationTimezone($this->user->getTimeZone());
                 $model->setFixed($form->getInput('fixed'));
                 $model->setCategory($form->getInput('category'));
 
-                if($model->getId()){
-                    $this->service->modifyEntry($model);
-                }else{
-                    $this->service->createEntry($model);
+                try{
+                    if($model->getId()){
+                        $this->service->modifyEntry($model);
+                    }else{
+                        $this->service->createEntry($model);
+                    }
+                }catch (PermissionDenied $e){
+                    $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI&failed=1');
                 }
 
-                $this->ctrl->setParameter($this, 'saved', 1);
                 $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI&saved=1');
             } catch (Exception $e) {
                 $content[] = $this->uiRenderer->render(

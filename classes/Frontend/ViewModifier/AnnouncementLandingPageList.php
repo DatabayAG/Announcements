@@ -3,6 +3,7 @@
 
 namespace ILIAS\Plugin\Announcements\Frontend\ViewModifier;
 
+use ILIAS\Plugin\Announcements\AccessControl\Exception\PermissionDenied;
 use ILIAS\Plugin\Announcements\Entry\Model;
 use ILIAS\Plugin\Announcements\Frontend\ViewModifier;
 use ILIAS\UI\Component\Component;
@@ -31,72 +32,72 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
      */
     public function modifyHtml(string $component, string $part, array $parameters) : array
     {
+        try{
+            $announcements = $this->service->findAllValid();
+        }catch(PermissionDenied $e){
+            return [];
+        }
+
         $this->mainTemlate->addCss($this->getCoreController()->getPluginObject()->getDirectory() . '/css/announcements.css');
 
         $listTemplate = $this->getCoreController()->getPluginObject()->getTemplate('tpl.landing_page_list.html', true, true);
 
         $listTemplate->setVariable('TITLE', 'Dummy News');
-
         $listTemplate->setVariable(
             'RSS_COMPONENT',
             $this->uiRenderer->render(
-                $this->getRssSubscriptionModalTriggerComponents(
-                    $this->getCoreController()->getPluginObject()->txt('rss_subscription_btn_label'),
-                    'getRssModalContent'
-                )
+                $this->getRssSubscriptionModalTriggerComponents('', 'getRssModalContent')
             )
         );
         $listTemplate->setVariable(
             'RSS_ROOM_CHANGE_COMPONENT',
             $this->uiRenderer->render(
-                $this->getRssSubscriptionModalTriggerComponents(
-                    $this->getCoreController()->getPluginObject()->txt('rss_subscription_room_change_btn_label'),
-                    'getRssRoomChangeModalContent'
-                )
+                $this->getRssSubscriptionModalTriggerComponents('', 'getRssRoomChangeModalContent')
             )
         );
-        $listTemplate->setVariable(
-            'CREATE_NEWS',
-            $this->uiRenderer->render(
-                $this->uiFactory->link()->standard(
-                    '', 
-                    $this->ctrl->getLinkTargetByClass(
-                        [\ilUIPluginRouterGUI::class, get_class($this->getCoreController())],
-                        'News.create'
-                    )
-                )
-            )
-        );
-
-        $repository = new \ActiveRecordList(new Model());
-        foreach ($repository->get() as $object) {
-            $acc = new \ilAccordionGUI();
-            $author = new \ilObjUser($object->getCreatorUsrId());
-            $published = new \ilDateTime($object->getPublishTs(), IL_CAL_UNIX, $this->user->getTimeZone());
-
-            $edit = $this->uiRenderer->render(
-                $this->uiFactory->link()->standard(
-                    '',
-                    $this->ctrl->getLinkTargetByClass(
-                        [\ilUIPluginRouterGUI::class, get_class($this->getCoreController())],
-                        'News.update'
-                    ) . '&id=' . $object->getId()
+        if($this->accessHandler->mayCreateEntries()){
+            $listTemplate->setVariable(
+                'CREATE_NEWS',
+                $this->uiRenderer->render(
+                    $this->getNewsCommandLink('', 'create')
                 )
             );
-            $header_action =
-                $edit .
-                '<span class="announcements_meta pull-right">' .
-                $author->getPublicName() . ' | ' . $published .
-                '</span>';
-
-            $acc->addItem($object->getTitle() . $header_action, $object->getContent());
-            $listTemplate->setVariable('NEWS_ENTRY', $acc->getHTML());
-            $listTemplate->parseCurrentBlock();
         }
 
-        $content = [];
+        $acc = new \ilAccordionGUI();
+        $usrIds = array_map(function($announcement){return $announcement->getCreatorUsrId();},$announcements);
+        $names = \ilUserUtil::getNamePresentation($usrIds);
+        foreach ($announcements as $object) {
+            $published =  \ilDatePresentation::formatDate(
+                new \ilDateTime($object->getPublishTs(), IL_CAL_UNIX, $this->user->getTimeZone())
+            );
+            if($this->accessHandler->mayEditEntry($object)) {
+                $edit = $this->uiRenderer->render(
+                    $this->getNewsCommandLink('', 'update', $object->getId())
+                );
+            }
+            if($this->accessHandler->mayDeleteEntry($object)) {
+                $delete = $this->uiRenderer->render(
+                    $this->getNewsCommandLink('', 'delete', $object->getId())
+                );
+            }
+            $header_action =
+                $object->getTitle() .
+                '<span class="pull-right announcements_meta">' .
+                preg_replace('/^\[([^\s]*)\]$/', '$1', $names[$object->getCreatorUsrId()]) .
+                ' | ' . $published . $delete . $edit .
+                '</span>';
+
+            $acc->addItem($header_action, $object->getContent());
+        }
+        $listTemplate->setVariable('NEWS_ENTRY', $acc->getHTML());
+        $listTemplate->parseCurrentBlock();
+
         if (isset($this->request->getQueryParams()['saved'])) {
             $content[] = $this->uiFactory->messageBox()->success($this->lng->txt('saved_successfully'));
+        }
+        if (isset($this->request->getQueryParams()['failed'])) {
+            $content[] = $this->uiFactory->messageBox()->failure($this->lng->txt('insufficent_permission'));
         }
         $content[] = $this->uiFactory->legacy($listTemplate->get());
 
@@ -135,5 +136,22 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
         ];
 
         return $components;
+    }
+
+    /**
+     * @param string $label
+     * @param string $command
+     * @return Component
+     */
+    private function getNewsCommandLink(string $label, string $command, int $objectId = 0) : Component
+    {
+        $link = $this->ctrl->getLinkTargetByClass(
+            [\ilUIPluginRouterGUI::class, get_class($this->getCoreController())],
+            'News.'.$command
+        );
+        if($objectId > 0){
+            $link .= '&id=' . $objectId;
+        }
+        return $this->uiFactory->link()->standard($label, $link);
     }
 }
