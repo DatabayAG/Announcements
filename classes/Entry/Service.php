@@ -209,6 +209,7 @@ class Service
 
         if (!$this->accessHandler->mayReadUnpublishedEntries()) {
             $runtimeConditions[] = '(' . implode(' OR ', [
+                'publish_ts = ' . $this->db->quote(0, 'integer'),
                 'publish_ts <= ' . $this->db->quote(time(), 'integer'),
                 'creator_usr_id = ' . $this->db->quote($this->actor->getId(), 'integer'),
             ]) . ')';
@@ -216,6 +217,7 @@ class Service
 
         if (!$this->accessHandler->mayReadExpiredEntries()) {
             $runtimeConditions[] = '(' . implode(' OR ', [
+                'expiration_ts = ' . $this->db->quote(0, 'integer'),
                 'expiration_ts >= ' . $this->db->quote(time(), 'integer'),
                 'creator_usr_id = ' . $this->db->quote($this->actor->getId(), 'integer'),
             ]) . ')';
@@ -233,7 +235,6 @@ class Service
 
         $list = Model::where($effectiveCondition)->orderBy('fixed', 'DESC')->orderBy('publish_ts', 'DESC');
 
-        $list->get();
         return $list->get();
     }
 
@@ -246,7 +247,6 @@ class Service
 
         $list = Model::where('id = '.$this->db->quote($id, 'integer'));
 
-        $x = $list->first();
         return $list->first();
     }
 

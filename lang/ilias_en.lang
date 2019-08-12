@@ -27,3 +27,4 @@ news_fixed_info#:#This news should be fixed on top of all other news
 category#:#Category
 news_category_info#:#Context of the news
 room_change#:#room change
+form_msg_invalid_date_range#:#Invalid date range. Maximum 21 days

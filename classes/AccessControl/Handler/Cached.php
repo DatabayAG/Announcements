@@ -124,4 +124,16 @@ class Cached implements AccessControl\AccessHandler
 
         return ($this->cache[__METHOD__] = $this->origin->mayReadUnpublishedEntries());
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function isManager() : bool
+    {
+        if (isset($this->cache[__METHOD__])) {
+            return $this->cache[__METHOD__];
+        }
+
+        return ($this->cache[__METHOD__] = $this->origin->isManager());
+    }
 }

@@ -44,4 +44,7 @@ interface AccessHandler
 
 	/** @return bool */
 	public function mayReadUnpublishedEntries() : bool;
+
+    /** @return bool */
+    public function isManager(): bool;
 }

@@ -27,3 +27,4 @@ news_fixed_info#:#Diese Ankündigung soll über allen anderen angezeigt werden
 category#:#Kategorie
 news_category_info#:#Einordung in einen bestimmten Kontext
 room_change#:#Raumänderung
+form_msg_invalid_date_range#:#Ungültige Laufzeit. Maximal 21 Tage

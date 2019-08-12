@@ -33,7 +33,7 @@ class NewsGUI extends \ilPropertyFormGUI
      * @return \ilPropertyFormGUI
      * @throws \ilDateTimeException
      */
-    public function initForm(string $action, Model $model = null) : \ilPropertyFormGUI
+    public function initForm(bool $isManager, string $action, Model $model = null) : \ilPropertyFormGUI
     {
         $this->setTitle($this->translate('create_news'));
         $this->setFormAction($action);
@@ -61,6 +61,7 @@ class NewsGUI extends \ilPropertyFormGUI
         if($model && $model->getContent()){
             $input->setValue($model->getContent());
         }
+        $input->setRequired(true);
         $this->addItem($input);
 
         $input = new \ilDateTimeInputGUI($this->translate('publish_date'),'publish_date');
@@ -69,6 +70,9 @@ class NewsGUI extends \ilPropertyFormGUI
         if($model && $model->getPublishTs()){
             $input->setDate(new \ilDateTime($model->getPublishTs(),IL_CAL_UNIX, $this->user->getTimeZone()));
         }
+        if(!$isManager){
+            $input->setRequired(true);
+        }
         $this->addItem($input);
 
         $input = new \ilDateTimeInputGUI($this->translate('expiration_date'),'expiration_date');
@@ -76,6 +80,9 @@ class NewsGUI extends \ilPropertyFormGUI
         $input->setInfo($this->translate('news_expiration_date_info'));
         if($model && $model->getExpirationTs()){
             $input->setDate(new \ilDateTime($model->getExpirationTs(),IL_CAL_UNIX, $this->user->getTimeZone()));
+        }
+        if(!$isManager){
+            $input->setRequired(true);
         }
         $this->addItem($input);
 
@@ -107,14 +114,5 @@ class NewsGUI extends \ilPropertyFormGUI
             $translation = $DIC->language()->txt($key);
         }
         return $translation;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function checkInput()
-    {
-
-        return parent::checkInput();
     }
 }

@@ -58,7 +58,7 @@ class News extends Base
      */
     public function createCmd() : string
     {
-        return $this->gui->initForm($this->action)->getHTML();
+        return $this->gui->initForm($this->accessHandler->isManager(), $this->action)->getHTML();
     }
 
     /**
@@ -70,7 +70,7 @@ class News extends Base
         $id = (int) ($this->request->getQueryParams()['id'] ?? 0);
         $model = $this->service->findById($id);
 
-        return $this->gui->initForm($this->action, $model)->getHTML();
+        return $this->gui->initForm($this->accessHandler->isManager(), $this->action, $model)->getHTML();
     }
 
     /**
@@ -101,7 +101,7 @@ class News extends Base
             $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI');
         }
 
-        $form = $this->gui->initForm($this->action);
+        $form = $this->gui->initForm($this->accessHandler->isManager(), $this->action);
         if ($form->checkInput()) {
 
             if ($form->getInput('id')) {
@@ -125,6 +125,11 @@ class News extends Base
                 $model->setFixed($form->getInput('fixed'));
                 $model->setCategory($form->getInput('category'));
 
+                if(!$this->checkDateLimitation($model)){
+                    $item = $form->getItemByPostVar('expiration_date');
+                    $item->setAlert($this->coreController->getPluginObject()->txt('form_msg_invalid_date_range'));
+                    throw new PermissionDenied('Invalid date Range');
+                }
                 try{
                     if($model->getId()){
                         $this->service->modifyEntry($model);
@@ -137,9 +142,7 @@ class News extends Base
 
                 $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI&saved=1');
             } catch (Exception $e) {
-                $content[] = $this->uiRenderer->render(
-                    $this->uiFactory->messageBox()->failure($this->lng->txt('form_input_not_valid'))
-                );
+                $content[] = $this->uiFactory->messageBox()->failure($this->lng->txt('form_input_not_valid'));
             }
         }
 
@@ -147,4 +150,13 @@ class News extends Base
         $content[] = $this->uiFactory->legacy($form->getHtml());
 
         return $this->uiRenderer->render($content);
-    }}
+    }
+
+    private function checkDateLimitation(Model $model) : bool
+    {
+        if(!$this->accessHandler->isManager()){
+            return $model->getPublishTs() + (60*60*24*21) >= $model->getExpirationTs();
+        }
+        return true;
+    }
+}
