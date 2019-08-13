@@ -28,3 +28,5 @@ category#:#Kategorie
 news_category_info#:#Einordung in einen bestimmten Kontext
 room_change#:#Raumänderung
 form_msg_invalid_date_range#:#Ungültige Laufzeit. Maximal 21 Tage
+news_delete#:#Lösche Ankündigung
+news_delete_q#:#Sind sie sicher, dass sie die Ankündigung löschen wollen?

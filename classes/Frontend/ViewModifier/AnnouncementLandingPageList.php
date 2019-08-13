@@ -39,6 +39,7 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
         }
 
         $this->mainTemlate->addCss($this->getCoreController()->getPluginObject()->getDirectory() . '/css/announcements.css');
+        $this->mainTemlate->addJavaScript($this->getCoreController()->getPluginObject()->getDirectory() . '/js/announcements.js');
 
         $listTemplate = $this->getCoreController()->getPluginObject()->getTemplate('tpl.landing_page_list.html', true, true);
 
@@ -77,9 +78,22 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
                 );
             }
             if($this->accessHandler->mayDeleteEntry($object)) {
-                $delete = $this->uiRenderer->render(
-                    $this->getNewsCommandLink('', 'delete', $object->getId())
-                );
+                $deleteModal = $this->uiFactory
+                    ->modal()
+                    ->interruptive(
+                        $this->getCoreController()->getPluginObject()->txt('news_delete'),
+                        $this->getCoreController()->getPluginObject()->txt('news_delete_q'),
+                        $this->ctrl->getLinkTargetByClass(
+                            [\ilUIPluginRouterGUI::class, get_class($this->getCoreController())],
+                            'News.delete'
+                        ). '&id=' . $object->getId()
+                    );
+                $deleteBtn =
+                $deleteBtn = $this->uiFactory
+                    ->button()
+                    ->shy('', '#')
+                    ->withOnClick($deleteModal->getShowSignal());
+                $delete =  $this->uiRenderer->render([$deleteModal,$deleteBtn]);
             }
             $header_action =
                 $object->getTitle() .
@@ -111,9 +125,6 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
      */
     private function getRssSubscriptionModalTriggerComponents(string $label, string $command) : array
     {
-        global $DIC;
-        $f = $DIC->ui()->factory();
-
         $modal = $this->uiFactory
             ->modal()
             ->roundtrip('', [])

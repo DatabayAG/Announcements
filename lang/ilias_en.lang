@@ -28,3 +28,5 @@ category#:#Category
 news_category_info#:#Context of the news
 room_change#:#room change
 form_msg_invalid_date_range#:#Invalid date range. Maximum 21 days
+news_delete#:#Delete news
+news_delete_q#:#Are you sure that you want to delete the news?

@@ -41,14 +41,15 @@
 	font-weight: normal;
 	font-size: small;
 }
-.announcements_accordion .il_VAccordionHead a{
+.announcements_accordion .il_VAccordionHead .announcements_meta a,
+.announcements_accordion .il_VAccordionHead .announcements_meta .modal + button{
 	float: right;
 	margin-left: .5em;
 }
-.announcements_accordion .il_VAccordionHead a[href*="News.update"]{
+.announcements_accordion .il_VAccordionHead .announcements_meta a[href*="News.update"]{
 	background-image: url("../templates/images/pen.svg");
 }
-.announcements_accordion .il_VAccordionHead a[href*="News.delete"]{
+.announcements_accordion .il_VAccordionHead .announcements_meta .modal + button{
 	background-image: url("../templates/images/trash.svg");
 }
 
