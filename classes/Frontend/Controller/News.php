@@ -155,7 +155,7 @@ class News extends Base
     private function checkDateLimitation(Model $model) : bool
     {
         if(!$this->accessHandler->isManager()){
-            return $model->getPublishTs() + (60*60*24*21) >= $model->getExpirationTs();
+            return $model->getPublishTs() <= $model->getExpirationTs() && $model->getPublishTs() + (60*60*24*21) >= $model->getExpirationTs();
         }
         return true;
     }
