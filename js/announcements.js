@@ -5,7 +5,7 @@ $(document).ready(
         'click',
         function ()
         {
-        $(this).closest('.modal').modal("hide");
+            $(this).closest('.modal').modal("hide");
             return false;
         }
     );
@@ -20,7 +20,7 @@ $(document).ready(
         'click',
         function ()
         {
-        $(this).closest('form').submit();
+            $(this).closest('form').submit();
             return false;
         }
     );
