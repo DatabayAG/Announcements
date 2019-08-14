@@ -17,7 +17,7 @@ This plugin MUST be installed as a
 
 The files MUST be saved in the following directory:
 
-	<ILIAS>/Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/Announcements
+    <ILIAS>/Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/Announcements
 
 Correct file and folder permissions MUST be
 ensured by the responsible system administrator.

@@ -1,59 +1,59 @@
 .announcements_layer{
-	background: white;
-	padding: 1em;
+    background: white;
+    padding: 1em;
 }
 
 .announcements_head{
-	color:#932136;
-	padding: 1em 0;
-	font-weight: 600;
+    color:#932136;
+    padding: 1em 0;
+    font-weight: 600;
 }
 
 .announcements_head .pull-right{
-	background-size: contain;
+    background-size: contain;
 }
 .announcements_head .pull-right + .pull-right{
-	margin-right: .5em;
+    margin-right: .5em;
 }
 .announcements_rss{
-	background-image: url("../templates/images/rss_1.svg");
+    background-image: url("../templates/images/rss_1.svg");
 }
 .announcements_rooms_rss{
-	background-image: url("../templates/images/rss_2.svg");
+    background-image: url("../templates/images/rss_2.svg");
 }
 .announcements_create_news{
-	background-image: url("../templates/images/plus.svg");
+    background-image: url("../templates/images/plus.svg");
 }
 .pull-right > a,
 .pull-right button{
-	display: block;
-	width: 20px;
-	height: 20px;
+    display: block;
+    width: 20px;
+    height: 20px;
 }
 
 .announcements_accordion .il_VAccordionHead{
-	color:#932136;
-	font-weight: 700;
-	background-color: #e5e5e5;
+    color:#932136;
+    font-weight: 700;
+    background-color: #e5e5e5;
 }
 .announcements_accordion .il_VAccordionHead .announcements_meta{
-	color: #8d8d8d;
-	font-weight: normal;
-	font-size: small;
+    color: #8d8d8d;
+    font-weight: normal;
+    font-size: small;
 }
 .announcements_accordion .il_VAccordionHead .announcements_meta a,
 .announcements_accordion .il_VAccordionHead .announcements_meta .modal + button{
-	float: right;
-	margin-left: .5em;
+    float: right;
+    margin-left: .5em;
 }
 .announcements_accordion .il_VAccordionHead .announcements_meta a[href*="News.update"]{
-	background-image: url("../templates/images/pen.svg");
+    background-image: url("../templates/images/pen.svg");
 }
 .announcements_accordion .il_VAccordionHead .announcements_meta .modal + button{
-	background-image: url("../templates/images/trash.svg");
+    background-image: url("../templates/images/trash.svg");
 }
 
 .announcements_accordion .il_VAccordionContent{
-	padding: 1em;
-	border: 3px solid #e5e5e5;
+    padding: 1em;
+    border: 3px solid #e5e5e5;
 }

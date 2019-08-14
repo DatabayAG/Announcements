@@ -12,34 +12,34 @@ use ILIAS\Plugin\Announcements\AccessControl\Acl\Role;
  */
 class GenericRole implements Role
 {
-	/**
-	 * Unique id of Role
-	 * @var string
-	 */
-	protected $roleId = '';
+    /**
+     * Unique id of Role
+     * @var string
+     */
+    protected $roleId = '';
 
-	/**
-	 * GenericRole constructor.
-	 * @param string $roleId
-	 */
-	public function __construct(string $roleId)
-	{
-		$this->roleId = $roleId;
-	}
+    /**
+     * GenericRole constructor.
+     * @param string $roleId
+     */
+    public function __construct(string $roleId)
+    {
+        $this->roleId = $roleId;
+    }
 
-	/**
-	 * @inheritDoc
-	 */
-	public function getRoleId() : string
-	{
-		return $this->roleId;
-	}
+    /**
+     * @inheritDoc
+     */
+    public function getRoleId() : string
+    {
+        return $this->roleId;
+    }
 
-	/**
-	 * @inheritDoc
-	 */
-	public function __toString()
-	{
-		return $this->getRoleId();
-	}
+    /**
+     * @inheritDoc
+     */
+    public function __toString()
+    {
+        return $this->getRoleId();
+    }
 }

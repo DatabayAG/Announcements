@@ -12,16 +12,16 @@ use ILIAS\Plugin\Announcements\AccessControl\Acl\Role;
  */
 interface Acl
 {
-	/**
-	 * @param string $role
-	 * @param string $resource
-	 * @param string $privilege
-	 * @return bool
-	 */
-	public function isAllowed(string $role, string $resource, string $privilege) : bool;
+    /**
+     * @param string $role
+     * @param string $resource
+     * @param string $privilege
+     * @return bool
+     */
+    public function isAllowed(string $role, string $resource, string $privilege) : bool;
 
-	/**
-	 * @return Role[]
-	 */
-	public function getRoles() : array;
+    /**
+     * @return Role[]
+     */
+    public function getRoles() : array;
 }

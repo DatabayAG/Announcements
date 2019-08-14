@@ -9,8 +9,8 @@ namespace ILIAS\Plugin\Announcements\AccessControl\Acl;
  */
 interface Resource
 {
-	/**
-	 * @return string
-	 */
-	public function getResourceId() : string;
+    /**
+     * @return string
+     */
+    public function getResourceId() : string;
 }

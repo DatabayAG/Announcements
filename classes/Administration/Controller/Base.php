@@ -13,79 +13,79 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 abstract class Base extends \ilPluginConfigGUI
 {
-	/** @var Settings */
-	protected $settings;
+    /** @var Settings */
+    protected $settings;
 
-	/** @var \ilCtrl */
-	protected $ctrl;
+    /** @var \ilCtrl */
+    protected $ctrl;
 
-	/** @var \ilLanguage */
-	protected $lng;
+    /** @var \ilLanguage */
+    protected $lng;
 
-	/** @var \ilTemplate */
-	protected $tpl;
+    /** @var \ilTemplate */
+    protected $tpl;
 
-	/** @var \ilObjUser */
-	protected $user;
+    /** @var \ilObjUser */
+    protected $user;
 
-	/** @var \ILIAS\UI\Factory */
-	protected $uiFactory;
+    /** @var \ILIAS\UI\Factory */
+    protected $uiFactory;
 
-	/** @var \ILIAS\UI\Renderer */
-	protected $uiRenderer;
-	
-	/** @var ServerRequestInterface */
-	protected $request;
+    /** @var \ILIAS\UI\Renderer */
+    protected $uiRenderer;
 
-	/** @var \ilAnnouncementsPlugin */
-	protected $plugin_object;
+    /** @var ServerRequestInterface */
+    protected $request;
 
-	/** @var \ilRbacReview */
-	protected $rbacReview;
+    /** @var \ilAnnouncementsPlugin */
+    protected $plugin_object;
 
-	/** @var \ilObjectDataCache */
-	protected $objectCache;
+    /** @var \ilRbacReview */
+    protected $rbacReview;
 
-	/**
-	 * Base constructor.
-	 * @param \ilAnnouncementsPlugin $plugin_object
-	 */
-	public function __construct(\ilAnnouncementsPlugin $plugin_object = null)
-	{
-		global $DIC;
+    /** @var \ilObjectDataCache */
+    protected $objectCache;
 
-		$this->ctrl       = $DIC->ctrl();
-		$this->lng        = $DIC->language();
-		$this->tpl        = $DIC->ui()->mainTemplate();
-		$this->user       = $DIC->user();
-		$this->uiFactory  = $DIC->ui()->factory();
-		$this->uiRenderer = $DIC->ui()->renderer();
-		$this->request    = $DIC->http()->request();
-		$this->rbacReview = $DIC->rbac()->review();
-		$this->objectCache = $DIC['ilObjDataCache'];
-		$this->settings   = $DIC['plugin.announcements.settings'];
+    /**
+     * Base constructor.
+     * @param \ilAnnouncementsPlugin $plugin_object
+     */
+    public function __construct(\ilAnnouncementsPlugin $plugin_object = null)
+    {
+        global $DIC;
 
-		$this->plugin_object = $plugin_object;
-	}
+        $this->ctrl       = $DIC->ctrl();
+        $this->lng        = $DIC->language();
+        $this->tpl        = $DIC->ui()->mainTemplate();
+        $this->user       = $DIC->user();
+        $this->uiFactory  = $DIC->ui()->factory();
+        $this->uiRenderer = $DIC->ui()->renderer();
+        $this->request    = $DIC->http()->request();
+        $this->rbacReview = $DIC->rbac()->review();
+        $this->objectCache = $DIC['ilObjDataCache'];
+        $this->settings   = $DIC['plugin.announcements.settings'];
 
-	/**
-	 * @param string $cmd
-	 */
-	public function performCommand($cmd)
-	{
-		switch (true) {
-			case method_exists($this, $cmd):
-				$this->{$cmd}();
-				break;
+        $this->plugin_object = $plugin_object;
+    }
 
-			default:
-				$this->{$this->getDefaultCommand()}();
-				break;
-		}
-	}
+    /**
+     * @param string $cmd
+     */
+    public function performCommand($cmd)
+    {
+        switch (true) {
+            case method_exists($this, $cmd):
+                $this->{$cmd}();
+                break;
 
-	/**
-	 * @return string
-	 */
-	abstract protected function getDefaultCommand() : string;
+            default:
+                $this->{$this->getDefaultCommand()}();
+                break;
+        }
+    }
+
+    /**
+     * @return string
+     */
+    abstract protected function getDefaultCommand() : string;
 }

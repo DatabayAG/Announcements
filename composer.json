@@ -1,19 +1,19 @@
 {
-	"name":     "ILIAS/Plugin/Announcements",
-	"authors":  [
-		{
-			"name":  "Michael Jansen",
-			"email": "mjansen@databay.de"
-		}
-	],
-	"autoload": {
-		"psr-4": {
-			"ILIAS\\Plugin\\Announcements\\": "classes/"
-		}
-	},
-	"require": {
-		"php": "^7.0",
-		"psr/http-message": "^1.0",
-		"psr/http-server-handler": "^1.0"
-	}
+    "name":     "ILIAS/Plugin/Announcements",
+    "authors":  [
+        {
+            "name":  "Michael Jansen",
+            "email": "mjansen@databay.de"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "ILIAS\\Plugin\\Announcements\\": "classes/"
+        }
+    },
+    "require": {
+        "php": "^7.0",
+        "psr/http-message": "^1.0",
+        "psr/http-server-handler": "^1.0"
+    }
 }
