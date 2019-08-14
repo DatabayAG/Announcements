@@ -33,28 +33,27 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
      */
     public function modifyHtml(string $component, string $part, array $parameters) : array
     {
+        if (isset($this->request->getQueryParams()['saved'])) {
+            $content[] = $this->uiFactory->messageBox()->success($this->lng->txt('saved_successfully'));
+        }
+        if (isset($this->request->getQueryParams()['failed'])) {
+            $content[] = $this->uiFactory->messageBox()->failure($this->lng->txt('insufficent_permission'));
+        }
+
         try {
             $announcements = $this->service->findAllValid();
         } catch(PermissionDenied $e) {
             return [];
         }
 
-        $this->mainTemlate->addCss(
-            $this->getCoreController()->getPluginObject()->getDirectory() . '/css/announcements.css'
-        );
-        $this->mainTemlate->addJavaScript(
-            $this->getCoreController()->getPluginObject()->getDirectory() . '/js/announcements.js'
-        );
+        $plugin = $this->getCoreController()->getPluginObject();
+        $this->mainTemlate->addCss($plugin->getDirectory() . '/css/announcements.css');
+        $this->mainTemlate->addJavaScript($plugin->getDirectory() . '/js/announcements.js');
 
-        $listTemplate = $this->getCoreController()->getPluginObject()->getTemplate(
-            'tpl.landing_page_list.html',
-            true,
-            true
-        );
+        $listTemplate = $plugin->getTemplate('tpl.landing_page_list.html', true, true);
 
-        $listTemplate->setVariable('TITLE', 'Dummy News');
-        $listTemplate->setVariable(
-            'RSS_COMPONENT',
+        $listTemplate->setVariable('TITLE', $plugin->txt('news'));
+        $listTemplate->setVariable('RSS_COMPONENT',
             $this->uiRenderer->render(
                 $this->getRssSubscriptionModalTriggerComponents('', 'getRssModalContent')
             )
@@ -66,8 +65,7 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
             )
         );
         if ($this->accessHandler->mayCreateEntries() ){
-            $listTemplate->setVariable(
-                'CREATE_NEWS',
+            $listTemplate->setVariable('CREATE_NEWS',
                 $this->uiRenderer->render(
                     $this->getNewsCommandLink('', 'create')
                 )
@@ -75,56 +73,58 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
         }
 
         $acc = new \ilAccordionGUI();
-        $usrIds = array_map(
-            function($announcement)
-            {
-                return $announcement->getCreatorUsrId();
-            },
-            $announcements
-        );
-        $names = \ilUserUtil::getNamePresentation($usrIds);
-        foreach ($announcements as $object) {
-            $published =  \ilDatePresentation::formatDate(
-                new \ilDateTime($object->getPublishTs(), IL_CAL_UNIX, $this->user->getTimeZone())
+        if (empty($announcements)) {
+            $listTemplate->setVariable('NEWS_EMPTY',  $plugin->txt('news_empty'));
+        } else {
+            $usrIds = array_map(
+                function($announcement)
+                {
+                    return $announcement->getCreatorUsrId();
+                },
+                $announcements
             );
-            if ($this->accessHandler->mayEditEntry($object)) {
-                $edit = $this->uiRenderer->render(
-                    $this->getNewsCommandLink('', 'update', $object->getId())
+            $names = \ilUserUtil::getNamePresentation($usrIds);
+            foreach ($announcements as $object) {
+                $published =  \ilDatePresentation::formatDate(
+                    new \ilDateTime($object->getPublishTs(), IL_CAL_UNIX, $this->user->getTimeZone())
                 );
-            }
-            if ($this->accessHandler->mayDeleteEntry($object)) {
-                $deleteModal = $this->uiFactory
-                    ->modal()
-                    ->interruptive(
-                        $this->getCoreController()->getPluginObject()->txt('news_delete'),
-                        $this->getCoreController()->getPluginObject()->txt('news_delete_q'),
-                        $this->ctrl->getLinkTargetByClass(
-                            [\ilUIPluginRouterGUI::class, get_class($this->getCoreController())],
-                            'News.delete'
-                        ). '&id=' . $object->getId()
+                $edit = '';
+                if ($this->accessHandler->mayEditEntry($object)) {
+                    $edit = $this->uiRenderer->render(
+                        $this->getNewsCommandLink('', 'update', $object->getId())
                     );
-                $deleteBtn =
-                $deleteBtn = $this->uiFactory->button()->shy('', '#')->withOnClick($deleteModal->getShowSignal());
-                $delete =  $this->uiRenderer->render([$deleteModal, $deleteBtn]);
+                }
+                $delete = '';
+                if ($this->accessHandler->mayDeleteEntry($object)) {
+                    $deleteModal = $this->uiFactory
+                        ->modal()
+                        ->interruptive(
+                            $plugin->txt('news_delete'),
+                            $plugin->txt('news_delete_q'),
+                            $this->ctrl->getLinkTargetByClass(
+                                [\ilUIPluginRouterGUI::class, get_class($this->getCoreController())],
+                                'News.delete'
+                            ). '&id=' . $object->getId()
+                        );
+                    $deleteBtn =
+                    $deleteBtn = $this->uiFactory->button()->shy('', '#')->withOnClick($deleteModal->getShowSignal());
+                    $delete =  $this->uiRenderer->render([$deleteModal, $deleteBtn]);
+                }
+
+                $header = $plugin->getTemplate('tpl.announcement_header.html', true, true);
+                $header->setVariable('TITLE', $object->getTitle());
+                $header->setVariable('ACTIONS', $delete . $edit);
+                $header->setVariable(
+                    'META_INFOS',
+                    preg_replace('/^\[([^\s]*)\]$/', '$1', $names[$object->getCreatorUsrId()]) . ' | ' . $published
+                );
+
+                $acc->addItem($header->get(), nl2br($object->getContent()));
             }
-            $header_action =
-                $object->getTitle() .
-                '<span class="pull-right announcements_meta">' .
-                    preg_replace('/^\[([^\s]*)\]$/', '$1', $names[$object->getCreatorUsrId()]) .
-                    ' | ' . $published . $delete . $edit .
-                '</span>';
+            $listTemplate->setVariable('NEWS_ENTRY', $acc->getHTML());
 
-            $acc->addItem($header_action, $object->getContent());
         }
-        $listTemplate->setVariable('NEWS_ENTRY', $acc->getHTML());
         $listTemplate->parseCurrentBlock();
-
-        if (isset($this->request->getQueryParams()['saved'])) {
-            $content[] = $this->uiFactory->messageBox()->success($this->lng->txt('saved_successfully'));
-        }
-        if (isset($this->request->getQueryParams()['failed'])) {
-            $content[] = $this->uiFactory->messageBox()->failure($this->lng->txt('insufficent_permission'));
-        }
         $content[] = $this->uiFactory->legacy($listTemplate->get());
 
         return ['mode' => \ilUIHookPluginGUI::PREPEND, 'html' => $this->uiRenderer->render($content)];

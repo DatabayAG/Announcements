@@ -5,6 +5,7 @@ namespace ILIAS\Plugin\Announcements\Entry;
 
 use ILIAS\Plugin\Announcements\AccessControl\AccessHandler;
 use ILIAS\Plugin\Announcements\AccessControl\Exception\PermissionDenied;
+use ILIAS\Plugin\Announcements\AccessControl\Exception\PermissionRestricted;
 use ILIAS\Plugin\Announcements\Entry\Exception\NotFound;
 use ILIAS\Plugin\Announcements\Entry\Exception\CommandLogic;
 
@@ -57,6 +58,7 @@ class Service
     /**
      * @param Model $entry
      * @throws PermissionDenied
+     * @throws PermissionRestricted
      * @throws CommandLogic
      */
     public function createEntry(Model $entry)
@@ -69,6 +71,16 @@ class Service
             throw new CommandLogic('An entry with id cannot be created!');
         }
 
+        if (!$this->accessHandler->isManager()){
+            if(
+                $entry->getPublishTs() <= $entry->getExpirationTs() &&
+                $entry->getPublishTs() + (60*60*24*21) >= $entry->getExpirationTs()
+            ) {
+                throw new PermissionRestricted('Invalid date range!');
+            }
+            $entry->setFixed(0);
+        }
+
         $entry->setCreatedTs(time());
         $entry->setCreatorUsrId($this->actor->getId());
 
@@ -78,8 +90,10 @@ class Service
     /**
      * @param Model $entry
      * @throws PermissionDenied
+     * @throws PermissionRestricted
      * @throws CommandLogic
      * @throws NotFound
+     * @throws \arException
      */
     public function modifyEntry(Model $entry)
     {
@@ -89,6 +103,24 @@ class Service
 
         if (!$entry->getId()) {
             throw new CommandLogic('An entry without id cannot be modified!');
+        }
+
+        if (!$this->accessHandler->isManager()){
+            $x = $entry->getPublishTs();
+            $y = $entry->getExpirationTs();
+            $z = $entry->getPublishTs() + (60*60*24*21);
+            if(
+                $entry->getPublishTs() >= $entry->getExpirationTs() ||
+                $entry->getPublishTs() + (60*60*24*21) <= $entry->getExpirationTs()
+            ) {
+                throw new PermissionRestricted('Invalid date range!');
+            }
+            //Avoids ActiveRecord Cache
+            $old = $this->db->query(
+                'SELECT * FROM ' . $entry::returnDbTableName() .
+                ' WHERE id = ' . $this->db->quote($entry->getId(),'integer')
+            )->fetch();
+            $entry->setFixed($old['fixed']);
         }
 
         try {

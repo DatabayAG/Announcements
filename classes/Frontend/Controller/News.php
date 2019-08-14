@@ -3,6 +3,7 @@
 namespace ILIAS\Plugin\Announcements\Frontend\Controller;
 
 use ILIAS\Plugin\Announcements\AccessControl\Exception\PermissionDenied;
+use ILIAS\Plugin\Announcements\AccessControl\Exception\PermissionRestricted;
 use ILIAS\Plugin\Announcements\Entry\Model;
 use ILIAS\Plugin\Announcements\Exception;
 use ILIAS\Plugin\Announcements\Frontend\Controller\GUI\NewsGUI;
@@ -124,28 +125,28 @@ class News extends Base
                 $model->setFixed($form->getInput('fixed'));
                 $model->setCategory($form->getInput('category'));
 
-                if (!$this->checkDateLimitation($model)) {
-                    $item = $form->getItemByPostVar('expiration_date');
-                    $item->setAlert($this->coreController->getPluginObject()->txt('form_msg_invalid_date_range'));
-                    throw new PermissionDenied('Invalid date Range');
-                }
+                $this->gui = new NewsGUI($this->coreController->getPluginObject());
+                $form = $this->gui->initForm($this->accessHandler->isManager(), $this->action, $model);
+
                 try {
                     if ($model->getId()) {
                         $this->service->modifyEntry($model);
                     } else {
                         $this->service->createEntry($model);
                     }
-                } catch (PermissionDenied $e) {
+                    $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI&saved=1');
+                } catch(PermissionRestricted $e) {
+                    $item = $form->getItemByPostVar('expiration_date');
+                    $item->setAlert($this->coreController->getPluginObject()->txt('form_msg_invalid_date_range'));
+                } catch(PermissionDenied $e) {
                     $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI&failed=1');
                 }
 
-                $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI&saved=1');
             } catch (Exception $e) {
                 $content[] = $this->uiFactory->messageBox()->failure($this->lng->txt('form_input_not_valid'));
             }
         }
 
-        $form->setValuesByPost();
         $content[] = $this->uiFactory->legacy($form->getHtml());
 
         return $this->uiRenderer->render($content);

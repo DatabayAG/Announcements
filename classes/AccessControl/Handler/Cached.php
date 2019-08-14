@@ -70,11 +70,11 @@ class Cached implements AccessControl\AccessHandler
      */
     public function mayEditEntry(Model $entry) : bool
     {
-        if (isset($this->cache[__METHOD__])) {
-            return $this->cache[__METHOD__];
+        if (isset($this->cache[__METHOD__ . $entry->getId()])) {
+            return $this->cache[__METHOD__ . $entry->getId()];
         }
 
-        return ($this->cache[__METHOD__] = $this->origin->mayEditEntry($entry));
+        return ($this->cache[__METHOD__ . $entry->getId()] = $this->origin->mayEditEntry($entry));
     }
 
     /**
@@ -82,11 +82,11 @@ class Cached implements AccessControl\AccessHandler
      */
     public function mayDeleteEntry(Model $entry) : bool
     {
-        if (isset($this->cache[__METHOD__])) {
-            return $this->cache[__METHOD__];
+        if (isset($this->cache[__METHOD__ . $entry->getId()])) {
+            return $this->cache[__METHOD__ . $entry->getId()];
         }
 
-        return ($this->cache[__METHOD__] = $this->origin->mayDeleteEntry($entry));
+        return ($this->cache[__METHOD__ . $entry->getId()] = $this->origin->mayDeleteEntry($entry));
     }
 
     /**

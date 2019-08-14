@@ -94,15 +94,17 @@ class NewsGUI extends \ilPropertyFormGUI
         }
         $this->addItem($input);
 
-        $input = new \ilCheckboxInputGUI($this->translate('fixed'), 'fixed');
-        $input->setInfo($this->translate('news_fixed_info'));
-        if ($model && $model->getFixed()) {
-            $input->setChecked(true);
+        if ($isManager) {
+            $input = new \ilCheckboxInputGUI($this->translate('fixed'), 'fixed');
+            $input->setInfo($this->translate('news_fixed_info'));
+            if ($model && $model->getFixed()) {
+                $input->setChecked(true);
+            }
+            $this->addItem($input);
         }
-        $this->addItem($input);
 
         $input = new \ilSelectInputGUI($this->translate('category'), 'category');
-        $input->setOptions(['0' => '', '1' => $this->translate('room_change')]);
+        $input->setOptions(['0' => $this->translate('default'), '1' => $this->translate('room_change')]);
         $input->setInfo($this->translate('news_category_info'));
         if ($model && $model->getCategory()) {
             $input->setValue($model->getCategory());
