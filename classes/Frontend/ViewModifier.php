@@ -10,19 +10,19 @@ namespace ILIAS\Plugin\Announcements\Frontend;
  */
 interface ViewModifier
 {
-	/**
-	 * @param string $component
-	 * @param string $part
-	 * @param array  $parameters
-	 * @return bool
-	 */
-	public function shouldModifyHtml(string $component, string $part, array $parameters) : bool;
+    /**
+     * @param string $component
+     * @param string $part
+     * @param array  $parameters
+     * @return bool
+     */
+    public function shouldModifyHtml(string $component, string $part, array $parameters) : bool;
 
-	/**
-	 * @param string $component
-	 * @param string $part
-	 * @param array  $parameters
-	 * @return array A `\ilUIHookPluginGUI::getHtml()` compatible array
-	 */
-	public function modifyHtml(string $component, string $part, array $parameters) : array;
+    /**
+     * @param string $component
+     * @param string $part
+     * @param array  $parameters
+     * @return array A `\ilUIHookPluginGUI::getHtml()` compatible array
+     */
+    public function modifyHtml(string $component, string $part, array $parameters) : array;
 }

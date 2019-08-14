@@ -9,19 +9,19 @@ use ILIAS\GlobalScreen\Scope\MainMenu\Provider\AbstractStaticPluginMainMenuProvi
  */
 class ilAnnouncementsGlobalScreenProviderPlugin extends AbstractStaticPluginMainMenuProvider
 {
-	/**
-	 * @inheritDoc
-	 */
-	public function getStaticTopItems() : array
-	{
-		return [];
-	}
+    /**
+     * @inheritDoc
+     */
+    public function getStaticTopItems() : array
+    {
+        return [];
+    }
 
-	/**
-	 * @inheritDoc
-	 */
-	public function getStaticSubItems() : array
-	{
-		return [];
-	}
+    /**
+     * @inheritDoc
+     */
+    public function getStaticSubItems() : array
+    {
+        return [];
+    }
 }

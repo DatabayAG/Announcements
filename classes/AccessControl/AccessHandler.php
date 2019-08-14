@@ -12,36 +12,36 @@ use ILIAS\Plugin\Announcements\Entry\Model;
  */
 interface AccessHandler
 {
-	/**
-	 * @param \ilObjUser $actor
-	 * @return self
-	 */
-	public function withActor(\ilObjUser $actor) : self;
+    /**
+     * @param \ilObjUser $actor
+     * @return self
+     */
+    public function withActor(\ilObjUser $actor) : self;
 
-	/** @return bool */
-	public function mayReadEntries() : bool;
+    /** @return bool */
+    public function mayReadEntries() : bool;
 
-	/** @return bool */
-	public function mayCreateEntries() : bool;
+    /** @return bool */
+    public function mayCreateEntries() : bool;
 
-	/**
-	 * @param Model $entry
-	 * @return bool
-	 */
-	public function mayEditEntry(Model $entry) : bool;
+    /**
+     * @param Model $entry
+     * @return bool
+     */
+    public function mayEditEntry(Model $entry) : bool;
 
-	/**
-	 * @param Model $entry
-	 * @return bool
-	 */
-	public function mayDeleteEntry(Model $entry) : bool;
+    /**
+     * @param Model $entry
+     * @return bool
+     */
+    public function mayDeleteEntry(Model $entry) : bool;
 
-	/** @return bool */
-	public function mayMakeStickyEntries() : bool;
+    /** @return bool */
+    public function mayMakeStickyEntries() : bool;
 
-	/** @return bool */
-	public function mayReadExpiredEntries() : bool;
+    /** @return bool */
+    public function mayReadExpiredEntries() : bool;
 
-	/** @return bool */
-	public function mayReadUnpublishedEntries() : bool;
+    /** @return bool */
+    public function mayReadUnpublishedEntries() : bool;
 }

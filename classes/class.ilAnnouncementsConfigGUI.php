@@ -11,57 +11,57 @@ use ILIAS\Plugin\Announcements\Administration\GeneralSettings\UI\Form;
  */
 class ilAnnouncementsConfigGUI extends Base
 {
-	/** @var Acl */
-	private $acl;
-	
-	/**
-	 * @inheritDoc
-	 */
-	public function __construct(\ilAnnouncementsPlugin $plugin_object = null)
-	{
-		parent::__construct($plugin_object);
+    /** @var Acl */
+    private $acl;
 
-		$this->acl = $GLOBALS['DIC']['plugin.announcements.acl'];
-	}
+    /**
+     * @inheritDoc
+     */
+    public function __construct(\ilAnnouncementsPlugin $plugin_object = null)
+    {
+        parent::__construct($plugin_object);
 
-	/**
-	 * @inheritDoc
-	 */
-	protected function getDefaultCommand() : string
-	{
-		return 'showSettings';
-	}
+        $this->acl = $GLOBALS['DIC']['plugin.announcements.acl'];
+    }
 
-	/**
-	 *
-	 */
-	public function showSettings()
-	{
-		$content = [];
+    /**
+     * @inheritDoc
+     */
+    protected function getDefaultCommand() : string
+    {
+        return 'showSettings';
+    }
 
-		if (isset($this->request->getQueryParams()['saved'])) {
-			$content[] = $this->uiRenderer->render(
-				$this->uiFactory->messageBox()->success($this->lng->txt('saved_successfully'))
-			);
-		}
+    /**
+     *
+     */
+    public function showSettings()
+    {
+        $content = [];
 
-		$form = new Form($this->plugin_object, $this, $this->settings, $this->objectCache, $this->rbacReview, $this->acl);
-		$content[] = $form->getHTML();
+        if (isset($this->request->getQueryParams()['saved'])) {
+            $content[] = $this->uiRenderer->render(
+                $this->uiFactory->messageBox()->success($this->lng->txt('saved_successfully'))
+            );
+        }
 
-		$this->tpl->setContent(implode($content));
-	}
+        $form = new Form($this->plugin_object, $this, $this->settings, $this->objectCache, $this->rbacReview, $this->acl);
+        $content[] = $form->getHTML();
 
-	/**
-	 *
-	 */
-	public function saveSettings()
-	{
-		$form = new Form($this->plugin_object, $this, $this->settings, $this->objectCache, $this->rbacReview, $this->acl);
-		if ($form->saveObject()) {
-			$this->ctrl->setParameter($this, 'saved', 1);
-			$this->ctrl->redirect($this);
-		}
+        $this->tpl->setContent(implode($content));
+    }
 
-		$this->tpl->setContent($form->getHTML());
-	}
+    /**
+     *
+     */
+    public function saveSettings()
+    {
+        $form = new Form($this->plugin_object, $this, $this->settings, $this->objectCache, $this->rbacReview, $this->acl);
+        if ($form->saveObject()) {
+            $this->ctrl->setParameter($this, 'saved', 1);
+            $this->ctrl->redirect($this);
+        }
+
+        $this->tpl->setContent($form->getHTML());
+    }
 }

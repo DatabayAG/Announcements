@@ -12,34 +12,34 @@ use ILIAS\Plugin\Announcements\AccessControl\Acl\Resource;
  */
 class GenericResource implements Resource
 {
-	/**
-	 * Unique id of Role
-	 * @var string
-	 */
-	protected $resourceId = '';
+    /**
+     * Unique id of Role
+     * @var string
+     */
+    protected $resourceId = '';
 
-	/**
-	 * GenericRole constructor.
-	 * @param string $roleId
-	 */
-	public function __construct(string $roleId)
-	{
-		$this->resourceId = $roleId;
-	}
+    /**
+     * GenericRole constructor.
+     * @param string $roleId
+     */
+    public function __construct(string $roleId)
+    {
+        $this->resourceId = $roleId;
+    }
 
-	/**
-	 * @inheritDoc
-	 */
-	public function getResourceId() : string
-	{
-		return $this->resourceId;
-	}
+    /**
+     * @inheritDoc
+     */
+    public function getResourceId() : string
+    {
+        return $this->resourceId;
+    }
 
-	/**
-	 * @inheritDoc
-	 */
-	public function __toString()
-	{
-		return $this->getResourceId();
-	}
+    /**
+     * @inheritDoc
+     */
+    public function __toString()
+    {
+        return $this->getResourceId();
+    }
 }

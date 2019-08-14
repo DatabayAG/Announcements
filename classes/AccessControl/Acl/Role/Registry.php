@@ -13,71 +13,71 @@ use ILIAS\Plugin\Announcements\AccessControl\Acl\Role;
  */
 class Registry
 {
-	/**
-	 * @var array
-	 */
-	private $roles = [];
+    /**
+     * @var array
+     */
+    private $roles = [];
 
-	/**
-	 * @param Role $role
-	 * @return Registry
-	 * @throws InvalidArgument                 
-	 */
-	public function add(Role $role) : self
-	{
-		$roleId = $role->getRoleId();
-		if ($this->has($roleId)) {
-			throw new InvalidArgument(sprintf(
-				'Role id "%s" already exists in the registry',
-				$roleId
-			));
-		}
+    /**
+     * @param Role $role
+     * @return Registry
+     * @throws InvalidArgument
+     */
+    public function add(Role $role) : self
+    {
+        $roleId = $role->getRoleId();
+        if ($this->has($roleId)) {
+            throw new InvalidArgument(sprintf(
+                'Role id "%s" already exists in the registry',
+                $roleId
+            ));
+        }
 
-		$this->roles[$roleId] = $role;
+        $this->roles[$roleId] = $role;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * @param mixed $role
-	 * @return Role
-	 * @throws InvalidArgument
-	 */
-	public function get($role) : Role
-	{
-		if ($role instanceof Role) {
-			$roleId = $role->getRoleId();
-		} else {
-			$roleId = (string) $role;
-		}
+    /**
+     * @param mixed $role
+     * @return Role
+     * @throws InvalidArgument
+     */
+    public function get($role) : Role
+    {
+        if ($role instanceof Role) {
+            $roleId = $role->getRoleId();
+        } else {
+            $roleId = (string) $role;
+        }
 
-		if (!$this->has($role)) {
-			throw new InvalidArgument("Role '$roleId' not found");
-		}
+        if (!$this->has($role)) {
+            throw new InvalidArgument("Role '$roleId' not found");
+        }
 
-		return $this->roles[$roleId];
-	}
+        return $this->roles[$roleId];
+    }
 
-	/**
-	 * @param mixed $role
-	 * @return bool
-	 */
-	public function has($role) : bool
-	{
-		if ($role instanceof Role) {
-			$roleId = $role->getRoleId();
-		} else {
-			$roleId = (string) $role;
-		}
+    /**
+     * @param mixed $role
+     * @return bool
+     */
+    public function has($role) : bool
+    {
+        if ($role instanceof Role) {
+            $roleId = $role->getRoleId();
+        } else {
+            $roleId = (string) $role;
+        }
 
-		return isset($this->roles[$roleId]);
-	}
+        return isset($this->roles[$roleId]);
+    }
 
-	/**
-	 * @return Role
-	 */
-	public function getRoles() : array
-	{
-		return $this->roles;
-	}
+    /**
+     * @return Role
+     */
+    public function getRoles() : array
+    {
+        return $this->roles;
+    }
 }
