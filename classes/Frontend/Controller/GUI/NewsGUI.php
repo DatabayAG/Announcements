@@ -1,8 +1,6 @@
 <?php declare(strict_types=1);
 /* Copyright (c) 1998-2019 ILIAS open source, Extended GPL, see docs/LICENSE */
-
 namespace ILIAS\Plugin\Announcements\Frontend\Controller\GUI;
-
 
 use ILIAS\Plugin\Announcements\Entry\Model;
 
@@ -13,11 +11,20 @@ use ILIAS\Plugin\Announcements\Entry\Model;
  */
 class NewsGUI extends \ilPropertyFormGUI
 {
-
+    /**
+     * @var \ilObjUser
+     */
     protected $user;
 
+    /**
+     * @var \ilPlugin
+     */
     protected $plugin;
 
+    /**
+     * NewsGUI constructor.
+     * @param \ilPlugin $plugin
+     */
     public function __construct(\ilPlugin $plugin)
     {
         global $DIC;
@@ -28,6 +35,7 @@ class NewsGUI extends \ilPropertyFormGUI
     }
 
     /**
+     * @param bool $isManager
      * @param string $action
      * @param Model|null $model
      * @return \ilPropertyFormGUI
@@ -38,7 +46,7 @@ class NewsGUI extends \ilPropertyFormGUI
         $this->setTitle($this->translate('create_news'));
         $this->setFormAction($action);
 
-        if($model){
+        if ($model) {
             $this->setTitle($this->translate('update_news'));
 
             $input = new \ilHiddenInputGUI('id');
@@ -46,57 +54,57 @@ class NewsGUI extends \ilPropertyFormGUI
             $this->addItem($input);
         }
 
-        $input = new \ilTextInputGUI($this->translate('title'),'title');
+        $input = new \ilTextInputGUI($this->translate('title'), 'title');
         $input->setInfo($this->translate('news_title_info'));
-        if($model && $model->getTitle()){
+        if ($model && $model->getTitle()) {
             $input->setValue($model->getTitle());
         }
         $input->setRequired(true);
         $this->addItem($input);
 
-        $input = new \ilTextAreaInputGUI($this->translate('content'),'content');
+        $input = new \ilTextAreaInputGUI($this->translate('content'), 'content');
         $input->setRows(3);
         $input->setCols(40);
         $input->setInfo($this->translate('news_content_info'));
-        if($model && $model->getContent()){
+        if ($model && $model->getContent()) {
             $input->setValue($model->getContent());
         }
         $input->setRequired(true);
         $this->addItem($input);
 
-        $input = new \ilDateTimeInputGUI($this->translate('publish_date'),'publish_date');
+        $input = new \ilDateTimeInputGUI($this->translate('publish_date'), 'publish_date');
         $input->setShowTime(true);
         $input->setInfo($this->translate('news_publish_date_info'));
-        if($model && $model->getPublishTs()){
-            $input->setDate(new \ilDateTime($model->getPublishTs(),IL_CAL_UNIX, $this->user->getTimeZone()));
+        if ($model && $model->getPublishTs()) {
+            $input->setDate(new \ilDateTime($model->getPublishTs(), IL_CAL_UNIX, $this->user->getTimeZone()));
         }
-        if(!$isManager){
+        if (!$isManager) {
             $input->setRequired(true);
         }
         $this->addItem($input);
 
-        $input = new \ilDateTimeInputGUI($this->translate('expiration_date'),'expiration_date');
+        $input = new \ilDateTimeInputGUI($this->translate('expiration_date'), 'expiration_date');
         $input->setShowTime(true);
         $input->setInfo($this->translate('news_expiration_date_info'));
-        if($model && $model->getExpirationTs()){
-            $input->setDate(new \ilDateTime($model->getExpirationTs(),IL_CAL_UNIX, $this->user->getTimeZone()));
+        if ($model && $model->getExpirationTs()) {
+            $input->setDate(new \ilDateTime($model->getExpirationTs(), IL_CAL_UNIX, $this->user->getTimeZone()));
         }
-        if(!$isManager){
+        if (!$isManager) {
             $input->setRequired(true);
         }
         $this->addItem($input);
 
-        $input = new \ilCheckboxInputGUI($this->translate('fixed'),'fixed');
+        $input = new \ilCheckboxInputGUI($this->translate('fixed'), 'fixed');
         $input->setInfo($this->translate('news_fixed_info'));
-        if($model && $model->getFixed()){
+        if ($model && $model->getFixed()) {
             $input->setChecked(true);
         }
         $this->addItem($input);
 
-        $input = new \ilSelectInputGUI($this->translate('category'),'category');
+        $input = new \ilSelectInputGUI($this->translate('category'), 'category');
         $input->setOptions(['0' => '', '1' => $this->translate('room_change')]);
         $input->setInfo($this->translate('news_category_info'));
-        if($model && $model->getCategory()){
+        if ($model && $model->getCategory()) {
             $input->setValue($model->getCategory());
         }
         $this->addItem($input);
@@ -110,7 +118,7 @@ class NewsGUI extends \ilPropertyFormGUI
     public function translate(string $key, bool $forceGlobal = false){
         global $DIC;
         $translation = $this->plugin->txt($key);
-        if($forceGlobal || $translation[0] == "-"){
+        if ($forceGlobal || $translation[0] == "-") {
             $translation = $DIC->language()->txt($key);
         }
         return $translation;

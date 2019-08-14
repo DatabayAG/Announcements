@@ -28,20 +28,29 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
 
     /**
      * @inheritDoc
+     * @throws \arException
      * @throws \ilDateTimeException
      */
     public function modifyHtml(string $component, string $part, array $parameters) : array
     {
-        try{
+        try {
             $announcements = $this->service->findAllValid();
-        }catch(PermissionDenied $e){
+        } catch(PermissionDenied $e) {
             return [];
         }
 
-        $this->mainTemlate->addCss($this->getCoreController()->getPluginObject()->getDirectory() . '/css/announcements.css');
-        $this->mainTemlate->addJavaScript($this->getCoreController()->getPluginObject()->getDirectory() . '/js/announcements.js');
+        $this->mainTemlate->addCss(
+            $this->getCoreController()->getPluginObject()->getDirectory() . '/css/announcements.css'
+        );
+        $this->mainTemlate->addJavaScript(
+            $this->getCoreController()->getPluginObject()->getDirectory() . '/js/announcements.js'
+        );
 
-        $listTemplate = $this->getCoreController()->getPluginObject()->getTemplate('tpl.landing_page_list.html', true, true);
+        $listTemplate = $this->getCoreController()->getPluginObject()->getTemplate(
+            'tpl.landing_page_list.html',
+            true,
+            true
+        );
 
         $listTemplate->setVariable('TITLE', 'Dummy News');
         $listTemplate->setVariable(
@@ -56,7 +65,7 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
                 $this->getRssSubscriptionModalTriggerComponents('', 'getRssRoomChangeModalContent')
             )
         );
-        if($this->accessHandler->mayCreateEntries()){
+        if ($this->accessHandler->mayCreateEntries() ){
             $listTemplate->setVariable(
                 'CREATE_NEWS',
                 $this->uiRenderer->render(
@@ -66,18 +75,24 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
         }
 
         $acc = new \ilAccordionGUI();
-        $usrIds = array_map(function($announcement){return $announcement->getCreatorUsrId();},$announcements);
+        $usrIds = array_map(
+            function($announcement)
+            {
+                return $announcement->getCreatorUsrId();
+            },
+            $announcements
+        );
         $names = \ilUserUtil::getNamePresentation($usrIds);
         foreach ($announcements as $object) {
             $published =  \ilDatePresentation::formatDate(
                 new \ilDateTime($object->getPublishTs(), IL_CAL_UNIX, $this->user->getTimeZone())
             );
-            if($this->accessHandler->mayEditEntry($object)) {
+            if ($this->accessHandler->mayEditEntry($object)) {
                 $edit = $this->uiRenderer->render(
                     $this->getNewsCommandLink('', 'update', $object->getId())
                 );
             }
-            if($this->accessHandler->mayDeleteEntry($object)) {
+            if ($this->accessHandler->mayDeleteEntry($object)) {
                 $deleteModal = $this->uiFactory
                     ->modal()
                     ->interruptive(
@@ -89,17 +104,14 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
                         ). '&id=' . $object->getId()
                     );
                 $deleteBtn =
-                $deleteBtn = $this->uiFactory
-                    ->button()
-                    ->shy('', '#')
-                    ->withOnClick($deleteModal->getShowSignal());
-                $delete =  $this->uiRenderer->render([$deleteModal,$deleteBtn]);
+                $deleteBtn = $this->uiFactory->button()->shy('', '#')->withOnClick($deleteModal->getShowSignal());
+                $delete =  $this->uiRenderer->render([$deleteModal, $deleteBtn]);
             }
             $header_action =
                 $object->getTitle() .
                 '<span class="pull-right announcements_meta">' .
-                preg_replace('/^\[([^\s]*)\]$/', '$1', $names[$object->getCreatorUsrId()]) .
-                ' | ' . $published . $delete . $edit .
+                    preg_replace('/^\[([^\s]*)\]$/', '$1', $names[$object->getCreatorUsrId()]) .
+                    ' | ' . $published . $delete . $edit .
                 '</span>';
 
             $acc->addItem($header_action, $object->getContent());
@@ -158,9 +170,9 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
     {
         $link = $this->ctrl->getLinkTargetByClass(
             [\ilUIPluginRouterGUI::class, get_class($this->getCoreController())],
-            'News.'.$command
+            'News.'. $command
         );
-        if($objectId > 0){
+        if ($objectId > 0) {
             $link .= '&id=' . $objectId;
         }
         return $this->uiFactory->link()->standard($label, $link);

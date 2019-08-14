@@ -143,7 +143,7 @@ class RoleBased implements AccessHandler
     /**
      * @inheritDoc
      */
-    public function isManager(): bool
+    public function isManager() : bool
     {
         return count(
             array_intersect(

@@ -240,9 +240,9 @@ class Service
 
     /**
      * @param int $id
-     * @return Model
+     * @return \ActiveRecord
      */
-    public function findById(int $id) : Model
+    public function findById(int $id) : \ActiveRecord
     {
 
         $list = Model::where('id = '.$this->db->quote($id, 'integer'));

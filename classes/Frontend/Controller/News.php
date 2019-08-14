@@ -1,6 +1,5 @@
 <?php declare(strict_types=1);
 /* Copyright (c) 1998-2019 ILIAS open source, Extended GPL, see docs/LICENSE */
-
 namespace ILIAS\Plugin\Announcements\Frontend\Controller;
 
 use ILIAS\Plugin\Announcements\AccessControl\Exception\PermissionDenied;
@@ -82,9 +81,9 @@ class News extends Base
         $id = (int) ($this->request->getQueryParams()['id'] ?? 0);
         $model = $this->service->findById($id);
 
-        try{
+        try {
             $this->service->deleteEntry($model);
-        }catch (PermissionDenied $e){
+        } catch (PermissionDenied $e) {
             $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI&failed=1');
         }
 
@@ -97,7 +96,7 @@ class News extends Base
      */
     public function submitCmd() : string
     {
-        if(isset($this->request->getParsedBody()['cmd']['cancel'])){
+        if (isset($this->request->getParsedBody()['cmd']['cancel'])) {
             $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI');
         }
 
@@ -112,12 +111,12 @@ class News extends Base
             try {
                 $model->setTitle($form->getInput('title'));
                 $model->setContent($form->getInput('content'));
-                if($form->getInput('publish_date')){
+                if ($form->getInput('publish_date')) {
                     $date = new \DateTime($form->getInput('publish_date'));
                     $model->setPublishTs($date->getTimestamp());
                 }
                 $model->setPublishTimezone($this->user->getTimeZone());
-                if($form->getInput('expiration_date')) {
+                if ($form->getInput('expiration_date')) {
                     $date = new \DateTime($form->getInput('expiration_date'));
                     $model->setExpirationTs($date->getTimestamp());
                 }
@@ -125,18 +124,18 @@ class News extends Base
                 $model->setFixed($form->getInput('fixed'));
                 $model->setCategory($form->getInput('category'));
 
-                if(!$this->checkDateLimitation($model)){
+                if (!$this->checkDateLimitation($model)) {
                     $item = $form->getItemByPostVar('expiration_date');
                     $item->setAlert($this->coreController->getPluginObject()->txt('form_msg_invalid_date_range'));
                     throw new PermissionDenied('Invalid date Range');
                 }
-                try{
-                    if($model->getId()){
+                try {
+                    if ($model->getId()) {
                         $this->service->modifyEntry($model);
-                    }else{
+                    } else {
                         $this->service->createEntry($model);
                     }
-                }catch (PermissionDenied $e){
+                } catch (PermissionDenied $e) {
                     $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI&failed=1');
                 }
 
@@ -152,10 +151,16 @@ class News extends Base
         return $this->uiRenderer->render($content);
     }
 
+    /**
+     * @param Model $model
+     * @return bool
+     */
     private function checkDateLimitation(Model $model) : bool
     {
-        if(!$this->accessHandler->isManager()){
-            return $model->getPublishTs() <= $model->getExpirationTs() && $model->getPublishTs() + (60*60*24*21) >= $model->getExpirationTs();
+        if (!$this->accessHandler->isManager()) {
+            return
+                ($model->getPublishTs() <= $model->getExpirationTs()) &&
+                ($model->getPublishTs() + (60*60*24*21) >= $model->getExpirationTs());
         }
         return true;
     }
