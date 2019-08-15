@@ -101,14 +101,16 @@ class News extends Base
             $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI');
         }
 
-        $form = $this->gui->initForm($this->accessHandler->isManager(), $this->action);
+        if ($this->request->getParsedBody()['id']) {
+            $model = $this->service->findById((int) $this->request->getParsedBody()['id']);
+            $form = $this->gui->initForm($this->accessHandler->isManager(), $this->action, $model);
+        } else {
+            $model = new Model();
+            $form = $this->gui->initForm($this->accessHandler->isManager(), $this->action);
+        }
         if ($form->checkInput()) {
 
-            if ($form->getInput('id')) {
-                $model = $this->service->findById((int) $form->getInput('id'));
-            } else {
-                $model = new Model();
-            }
+
             try {
                 $model->setTitle($form->getInput('title'));
                 $model->setContent($form->getInput('content'));
@@ -124,9 +126,6 @@ class News extends Base
                 $model->setExpirationTimezone($this->user->getTimeZone());
                 $model->setFixed($form->getInput('fixed'));
                 $model->setCategory($form->getInput('category'));
-
-                $this->gui = new NewsGUI($this->coreController->getPluginObject());
-                $form = $this->gui->initForm($this->accessHandler->isManager(), $this->action, $model);
 
                 try {
                     if ($model->getId()) {
