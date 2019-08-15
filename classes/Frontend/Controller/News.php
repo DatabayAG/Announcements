@@ -58,7 +58,10 @@ class News extends Base
      */
     public function createCmd() : string
     {
-        return $this->gui->initForm($this->accessHandler->isManager(), $this->action)->getHTML();
+        return $this->gui->initForm(
+            $this->accessHandler->mayMakeTemporaryUnlimitedEntries(),
+            $this->action
+        )->getHTML();
     }
 
     /**
@@ -70,7 +73,10 @@ class News extends Base
         $id = (int) ($this->request->getQueryParams()['id'] ?? 0);
         $model = $this->service->findById($id);
 
-        return $this->gui->initForm($this->accessHandler->isManager(), $this->action, $model)->getHTML();
+        return $this->gui->initForm(
+            $this->accessHandler->mayMakeTemporaryUnlimitedEntries(),
+            $this->action, $model
+        )->getHTML();
     }
 
     /**
@@ -103,10 +109,16 @@ class News extends Base
 
         if ($this->request->getParsedBody()['id']) {
             $model = $this->service->findById((int) $this->request->getParsedBody()['id']);
-            $form = $this->gui->initForm($this->accessHandler->isManager(), $this->action, $model);
+            $form = $this->gui->initForm(
+                $this->accessHandler->mayMakeTemporaryUnlimitedEntries(),
+                $this->action, $model
+            );
         } else {
             $model = new Model();
-            $form = $this->gui->initForm($this->accessHandler->isManager(), $this->action);
+            $form = $this->gui->initForm(
+                $this->accessHandler->mayMakeTemporaryUnlimitedEntries(),
+                $this->action
+            );
         }
         if ($form->checkInput()) {
 
@@ -159,7 +171,7 @@ class News extends Base
      */
     private function checkDateLimitation(Model $model) : bool
     {
-        if (!$this->accessHandler->isManager()) {
+        if (!$this->accessHandler->mayMakeTemporaryUnlimitedEntries()) {
             return
                 ($model->getPublishTs() <= $model->getExpirationTs()) &&
                 ($model->getPublishTs() + (60*60*24*21) >= $model->getExpirationTs());

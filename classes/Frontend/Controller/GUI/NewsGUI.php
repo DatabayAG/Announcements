@@ -35,13 +35,13 @@ class NewsGUI extends \ilPropertyFormGUI
     }
 
     /**
-     * @param bool $isManager
+     * @param bool $unlimitedDateRange
      * @param string $action
      * @param Model|null $model
      * @return \ilPropertyFormGUI
      * @throws \ilDateTimeException
      */
-    public function initForm(bool $isManager, string $action, Model $model = null) : \ilPropertyFormGUI
+    public function initForm(bool $unlimitedDateRange, string $action, Model $model = null) : \ilPropertyFormGUI
     {
         $this->setTitle($this->translate('create_news'));
         $this->setFormAction($action);
@@ -78,7 +78,7 @@ class NewsGUI extends \ilPropertyFormGUI
         if ($model && $model->getPublishTs()) {
             $input->setDate(new \ilDateTime($model->getPublishTs(), IL_CAL_UNIX, $this->user->getTimeZone()));
         }
-        if (!$isManager) {
+        if (!$unlimitedDateRange) {
             $input->setRequired(true);
         }
         $this->addItem($input);
@@ -89,12 +89,12 @@ class NewsGUI extends \ilPropertyFormGUI
         if ($model && $model->getExpirationTs()) {
             $input->setDate(new \ilDateTime($model->getExpirationTs(), IL_CAL_UNIX, $this->user->getTimeZone()));
         }
-        if (!$isManager) {
+        if (!$unlimitedDateRange) {
             $input->setRequired(true);
         }
         $this->addItem($input);
 
-        if ($isManager) {
+        if ($unlimitedDateRange) {
             $input = new \ilCheckboxInputGUI($this->translate('fixed'), 'fixed');
             $input->setInfo($this->translate('news_fixed_info'));
             if ($model && $model->getFixed()) {

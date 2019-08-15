@@ -40,11 +40,11 @@ interface AccessHandler
     public function mayMakeStickyEntries() : bool;
 
     /** @return bool */
+    public function mayMakeTemporaryUnlimitedEntries(): bool;
+
+    /** @return bool */
     public function mayReadExpiredEntries() : bool;
 
     /** @return bool */
     public function mayReadUnpublishedEntries() : bool;
-
-    /** @return bool */
-    public function isManager(): bool;
 }

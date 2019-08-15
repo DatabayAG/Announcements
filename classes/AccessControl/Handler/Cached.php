@@ -128,12 +128,12 @@ class Cached implements AccessControl\AccessHandler
     /**
      * @inheritDoc
      */
-    public function isManager() : bool
+    public function mayMakeTemporaryUnlimitedEntries() : bool
     {
         if (isset($this->cache[__METHOD__])) {
             return $this->cache[__METHOD__];
         }
 
-        return ($this->cache[__METHOD__] = $this->origin->isManager());
+        return ($this->cache[__METHOD__] = $this->origin->mayMakeTemporaryUnlimitedEntries());
     }
 }

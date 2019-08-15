@@ -71,7 +71,7 @@ class Service
             throw new CommandLogic('An entry with id cannot be created!');
         }
 
-        if (!$this->accessHandler->isManager()){
+        if (!$this->accessHandler->mayMakeTemporaryUnlimitedEntries()){
             if(
                 $entry->getPublishTs() <= $entry->getExpirationTs() &&
                 $entry->getPublishTs() + (60*60*24*21) >= $entry->getExpirationTs()
@@ -105,7 +105,7 @@ class Service
             throw new CommandLogic('An entry without id cannot be modified!');
         }
 
-        if (!$this->accessHandler->isManager()){
+        if (!$this->accessHandler->mayMakeTemporaryUnlimitedEntries()){
             $x = $entry->getPublishTs();
             $y = $entry->getExpirationTs();
             $z = $entry->getPublishTs() + (60*60*24*21);
