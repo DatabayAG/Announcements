@@ -35,7 +35,7 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
     {
         try {
             $announcements = $this->service->findAllValid();
-        } catch(PermissionDenied $e) {
+        } catch (PermissionDenied $e) {
             return [];
         }
 
@@ -57,7 +57,7 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
                 $this->getRssSubscriptionModalTriggerComponents('', 'getRssRoomChangeModalContent')
             )
         );
-        if ($this->accessHandler->mayCreateEntries() ){
+        if ($this->accessHandler->mayCreateEntries()) {
             $listTemplate->setVariable('CREATE_NEWS',
                 $this->uiRenderer->render(
                     $this->getNewsCommandLink('', 'create')
@@ -73,15 +73,14 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
             );
         } else {
             $usrIds = array_map(
-                function($announcement)
-                {
+                function ($announcement) {
                     return $announcement->getCreatorUsrId();
                 },
                 $announcements
             );
             $names = \ilUserUtil::getNamePresentation($usrIds);
             foreach ($announcements as $object) {
-                $published =  \ilDatePresentation::formatDate(
+                $published = \ilDatePresentation::formatDate(
                     new \ilDateTime($object->getPublishTs(), IL_CAL_UNIX, $this->user->getTimeZone())
                 );
                 $edit = '';
@@ -100,11 +99,11 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
                             $this->ctrl->getLinkTargetByClass(
                                 [\ilUIPluginRouterGUI::class, get_class($this->getCoreController())],
                                 'News.delete'
-                            ). '&id=' . $object->getId()
+                            ) . '&id=' . $object->getId()
                         );
                     $deleteBtn =
                     $deleteBtn = $this->uiFactory->button()->shy('', '#')->withOnClick($deleteModal->getShowSignal());
-                    $delete =  $this->uiRenderer->render([$deleteModal, $deleteBtn]);
+                    $delete = $this->uiRenderer->render([$deleteModal, $deleteBtn]);
                 }
 
                 $header = $plugin->getTemplate('tpl.announcement_header.html', true, true);
@@ -166,7 +165,7 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
     {
         $link = $this->ctrl->getLinkTargetByClass(
             [\ilUIPluginRouterGUI::class, get_class($this->getCoreController())],
-            'News.'. $command
+            'News.' . $command
         );
         if ($objectId > 0) {
             $link .= '&id=' . $objectId;
