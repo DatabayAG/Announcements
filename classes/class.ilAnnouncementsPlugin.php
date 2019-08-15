@@ -201,4 +201,22 @@ class ilAnnouncementsPlugin extends ilUserInterfaceHookPlugin
         $this->includeClass('class.ilAnnouncementsGlobalScreenProviderPlugin.php');
         return new ilAnnouncementsGlobalScreenProviderPlugin($GLOBALS['DIC'], $this);
     }
+
+    /**
+     * @inheritDoc
+     */
+    protected function beforeUninstall()
+    {
+        global $DIC;
+        
+        if ($DIC->database()->tableExists('pl_announcements')) {
+            $DIC->database()->dropTable('pl_announcements');
+        }
+
+        if ($DIC->database()->sequenceExists('pl_announcements')) {
+            $DIC->database()->dropSequence('pl_announcements');
+        }
+
+        return parent::beforeUninstall();
+    }
 }
