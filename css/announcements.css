@@ -57,11 +57,3 @@
     padding: 1em;
     border: 3px solid #e5e5e5;
 }
-
-.announcements .empty_announcements_accordion{
-    font-style: italic;
-    padding: 1em;
-    border: 1px solid lightgrey;
-    background: rgb(240, 240, 240);
-    color: grey;
-}

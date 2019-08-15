@@ -23,7 +23,7 @@ publish_date#:#Veröffentlichungsdatum
 news_publish_date_info#:#Datum ab dem die Ankündigung gezeigt wird
 expiration_date#:#Verfallsdatum
 news_expiration_date_info#:#Datum ab dem die Ankündigung nicht mehr gezeigt wird
-fixed#:#Festgesetzt
+fixed#:#Oben halten
 news_fixed_info#:#Diese Nachrichten sollten über allen anderen Nachrichten bleiben
 category#:#Kategorie
 news_category_info#:#Einordung in einen bestimmten Kontext
@@ -33,3 +33,6 @@ news_delete#:#Ankündigung löschen
 news_delete_q#:#Sind sie sicher, dass sie die Ankündigung löschen wollen?
 news#:#Ankündigungen
 news_empty#:#Keine Ankündigungen verfügbar
+saved_successfully#:#Ankündigung gespeichert
+deleted_successfully#:#Ankündigung gelöscht
+insufficient_permission#:#Unzureichende Berechtigung

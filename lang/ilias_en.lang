@@ -23,13 +23,16 @@ publish_date#:#Publish Date
 news_publish_date_info#:#Date since the news is shown
 expiration_date#:#Expiration Date
 news_expiration_date_info#:#Date until the new is shown
-fixed#:#sticky
-news_fixed_info#:#This news should be stick on top of all other news
+fixed#:Fixed on top
+news_fixed_info#:#This news should be fixed on top of all other news
 category#:#Category
 news_category_info#:#Context of the news
-room_change#:#room change
+room_change#:#Room Change
 form_msg_invalid_date_range#:#Invalid date range. Maximum 21 days
 news_delete#:#Delete News
 news_delete_q#:#Are you sure that you want to delete this news?
 news#:#News
 news_empty#:#No news available
+saved_successfully#:#Saved news
+deleted_successfully#:#Deleted news
+insufficient_permission#:#Insufficient permission

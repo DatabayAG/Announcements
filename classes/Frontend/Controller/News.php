@@ -87,7 +87,7 @@ class News extends Base
         } catch (PermissionDenied $e) {
             $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI&failed=1');
         }
-
+        \ilUtil::sendSuccess($this->coreController->getPluginObject()->txt('deleted_successfully'),true);
         $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI&deleted=1');
     }
 
@@ -133,12 +133,14 @@ class News extends Base
                     } else {
                         $this->service->createEntry($model);
                     }
-                    $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI&saved=1');
+                    \ilUtil::sendSuccess($this->coreController->getPluginObject()->txt('saved_successfully'),true);
+                    $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI');
                 } catch(PermissionRestricted $e) {
                     $item = $form->getItemByPostVar('expiration_date');
                     $item->setAlert($this->coreController->getPluginObject()->txt('form_msg_invalid_date_range'));
                 } catch(PermissionDenied $e) {
-                    $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI&failed=1');
+                    \ilUtil::sendFailure($this->coreController->getPluginObject()->txt('insufficient_permission'),true);
+                    $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI');
                 }
 
             } catch (Exception $e) {

@@ -33,13 +33,6 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
      */
     public function modifyHtml(string $component, string $part, array $parameters) : array
     {
-        if (isset($this->request->getQueryParams()['saved'])) {
-            $content[] = $this->uiFactory->messageBox()->success($this->lng->txt('saved_successfully'));
-        }
-        if (isset($this->request->getQueryParams()['failed'])) {
-            $content[] = $this->uiFactory->messageBox()->failure($this->lng->txt('insufficent_permission'));
-        }
-
         try {
             $announcements = $this->service->findAllValid();
         } catch(PermissionDenied $e) {
@@ -74,7 +67,10 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
 
         $acc = new \ilAccordionGUI();
         if (empty($announcements)) {
-            $listTemplate->setVariable('NEWS_EMPTY',  $plugin->txt('news_empty'));
+            $listTemplate->setVariable(
+                'NEWS_EMPTY',
+                $this->uiRenderer->render($this->uiFactory->messageBox()->info($plugin->txt('news_empty')))
+            );
         } else {
             $usrIds = array_map(
                 function($announcement)
