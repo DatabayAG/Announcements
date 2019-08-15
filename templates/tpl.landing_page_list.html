@@ -3,15 +3,20 @@
     <!-- BEGIN news_header -->
     <div class="announcements_head">
         {TITLE}
-        <div class="pull-right">+ neue News</div>
+        <div class="pull-right announcements_create_news">{CREATE_NEWS}</div>
         <div class="pull-right announcements_rooms_rss">{RSS_ROOM_CHANGE_COMPONENT}</div>
         <div class="pull-right announcements_rss">{RSS_COMPONENT}</div>
     </div>
     <!-- END news_header -->
     <div class="announcements">
         <!-- BEGIN news_entry -->
-        <div class="announcements_accordion">{NEWS_ENTRY}</div>
+        <div class="announcements_accordion">
+            {NEWS_ENTRY}
+        </div>
         <!-- END news_entry -->
+        <!-- BEGIN news_empty -->
+        {NEWS_EMPTY}
+        <!-- END news_empty -->
     </div>
 </div>
 <!-- END news -->

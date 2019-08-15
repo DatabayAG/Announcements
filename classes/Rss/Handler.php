@@ -128,8 +128,9 @@ class Handler implements RequestHandlerInterface
                     'il_about_feed' => $entry->getId()
                 ])))
             );
+            $date = new \DateTime('@' . $entry->getPublishTs());
             $rssTemplate->setVariable('ITEM_DATE', $this->entities(
-                $entry->getPublishOn()->setTimezone(new \DateTimeZone('UTC'))->format('r')
+                $date->setTimezone(new \DateTimeZone('UTC'))->format('r')
             ));
             $rssTemplate->parseCurrentBlock();
         }

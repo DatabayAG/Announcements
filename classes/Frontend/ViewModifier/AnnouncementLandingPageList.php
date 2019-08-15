@@ -3,6 +3,8 @@
 
 namespace ILIAS\Plugin\Announcements\Frontend\ViewModifier;
 
+use ILIAS\Plugin\Announcements\AccessControl\Exception\PermissionDenied;
+use ILIAS\Plugin\Announcements\Entry\Model;
 use ILIAS\Plugin\Announcements\Frontend\ViewModifier;
 use ILIAS\UI\Component\Component;
 
@@ -26,68 +28,102 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
 
     /**
      * @inheritDoc
+     * @throws \arException
+     * @throws \ilDateTimeException
      */
     public function modifyHtml(string $component, string $part, array $parameters) : array
     {
-        $this->mainTemlate->addCss($this->getCoreController()->getPluginObject()->getDirectory() . '/css/announcements.css');
+        try {
+            $announcements = $this->service->findAllValid();
+        } catch(PermissionDenied $e) {
+            return [];
+        }
 
-        $listTemplate = $this->getCoreController()->getPluginObject()->getTemplate('tpl.landing_page_list.html', true, true);
+        $plugin = $this->getCoreController()->getPluginObject();
+        $this->mainTemlate->addCss($plugin->getDirectory() . '/css/announcements.css');
+        $this->mainTemlate->addJavaScript($plugin->getDirectory() . '/js/announcements.js');
 
-        $news_entries = [
-            [
-                'title' => 'Hochschulsport 2019',
-                'author' => 6,
-                'published_date' => '22.07.2019',
-                'content' => 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Sed porttitor lectus nibh.'
-            ],
-            [
-                'title' => 'Ringvorlesung 2019',
-                'author' => 6,
-                'published_date' => '20.07.2019',
-                'content' => 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Sed porttitor lectus nibh.'
-            ],
-            [
-                'title' => 'Termine Prüfungsauschschuss',
-                'author' => 6,
-                'published_date' => '25.06.2019',
-                'content' => 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Sed porttitor lectus nibh.'
-            ],
-        ];
+        $listTemplate = $plugin->getTemplate('tpl.landing_page_list.html', true, true);
 
-        $listTemplate->setVariable('TITLE', 'Dummy News');
-
-        $listTemplate->setVariable(
-            'RSS_COMPONENT',
+        $listTemplate->setVariable('TITLE', $plugin->txt('news'));
+        $listTemplate->setVariable('RSS_COMPONENT',
             $this->uiRenderer->render(
-                $this->getRssSubscriptionModalTriggerComponents(
-                    $this->getCoreController()->getPluginObject()->txt('rss_subscription_btn_label'),
-                    'getRssModalContent'
-                )
+                $this->getRssSubscriptionModalTriggerComponents('', 'getRssModalContent')
             )
         );
         $listTemplate->setVariable(
             'RSS_ROOM_CHANGE_COMPONENT',
             $this->uiRenderer->render(
-                $this->getRssSubscriptionModalTriggerComponents(
-                    $this->getCoreController()->getPluginObject()->txt('rss_subscription_room_change_btn_label'),
-                    'getRssRoomChangeModalContent'
-                )
+                $this->getRssSubscriptionModalTriggerComponents('', 'getRssRoomChangeModalContent')
             )
         );
-
-        foreach ($news_entries as $entry) {
-            $acc = new \ilAccordionGUI();
-            $acc->setBehaviour(\ilAccordionGUI::ALL_CLOSED);
-
-            $author = new \ilObjUser($entry['author']);
-            $published_on = $entry['published_date'];
-            $header_action = '<span class="announcements_meta pull-right">' . $author->getPublicName() . ' | ' . $published_on . '</span>';
-            $acc->addItem($entry['title'] . $header_action, $entry['content']);
-            $listTemplate->setVariable('NEWS_ENTRY', $acc->getHTML());
-            $listTemplate->parseCurrentBlock();
+        if ($this->accessHandler->mayCreateEntries() ){
+            $listTemplate->setVariable('CREATE_NEWS',
+                $this->uiRenderer->render(
+                    $this->getNewsCommandLink('', 'create')
+                )
+            );
         }
 
-        return ['mode' => \ilUIHookPluginGUI::PREPEND, 'html' => $listTemplate->get()];
+        $acc = new \ilAccordionGUI();
+        if (empty($announcements)) {
+            $listTemplate->setVariable(
+                'NEWS_EMPTY',
+                $this->uiRenderer->render($this->uiFactory->messageBox()->info($plugin->txt('news_empty')))
+            );
+        } else {
+            $usrIds = array_map(
+                function($announcement)
+                {
+                    return $announcement->getCreatorUsrId();
+                },
+                $announcements
+            );
+            $names = \ilUserUtil::getNamePresentation($usrIds);
+            foreach ($announcements as $object) {
+                $published =  \ilDatePresentation::formatDate(
+                    new \ilDateTime($object->getPublishTs(), IL_CAL_UNIX, $this->user->getTimeZone())
+                );
+                $edit = '';
+                if ($this->accessHandler->mayEditEntry($object)) {
+                    $edit = $this->uiRenderer->render(
+                        $this->getNewsCommandLink('', 'update', $object->getId())
+                    );
+                }
+                $delete = '';
+                if ($this->accessHandler->mayDeleteEntry($object)) {
+                    $deleteModal = $this->uiFactory
+                        ->modal()
+                        ->interruptive(
+                            $plugin->txt('news_delete'),
+                            $plugin->txt('news_delete_q'),
+                            $this->ctrl->getLinkTargetByClass(
+                                [\ilUIPluginRouterGUI::class, get_class($this->getCoreController())],
+                                'News.delete'
+                            ). '&id=' . $object->getId()
+                        );
+                    $deleteBtn =
+                    $deleteBtn = $this->uiFactory->button()->shy('', '#')->withOnClick($deleteModal->getShowSignal());
+                    $delete =  $this->uiRenderer->render([$deleteModal, $deleteBtn]);
+                }
+
+                $header = $plugin->getTemplate('tpl.announcement_header.html', true, true);
+                $header->setVariable('TITLE', $object->getTitle());
+                $header->setVariable('ACTIONS', $delete . $edit);
+                $header->setVariable(
+                    'META_INFOS',
+                    preg_replace('/^\[([^\s]*)\]$/', '$1', $names[$object->getCreatorUsrId()]) . ' | ' . $published
+                );
+
+                $acc->addItem($header->get(), nl2br($object->getContent()));
+            }
+            $listTemplate->setVariable('NEWS_ENTRY', $acc->getHTML());
+
+        }
+        $listTemplate->parseCurrentBlock();
+        $content[] = $this->uiFactory->legacy($listTemplate->get());
+
+        return ['mode' => \ilUIHookPluginGUI::PREPEND, 'html' => $this->uiRenderer->render($content)];
     }
 
     /**
@@ -97,9 +133,6 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
      */
     private function getRssSubscriptionModalTriggerComponents(string $label, string $command) : array
     {
-        global $DIC;
-        $f = $DIC->ui()->factory();
-
         $modal = $this->uiFactory
             ->modal()
             ->roundtrip('', [])
@@ -122,5 +155,22 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
         ];
 
         return $components;
+    }
+
+    /**
+     * @param string $label
+     * @param string $command
+     * @return Component
+     */
+    private function getNewsCommandLink(string $label, string $command, int $objectId = 0) : Component
+    {
+        $link = $this->ctrl->getLinkTargetByClass(
+            [\ilUIPluginRouterGUI::class, get_class($this->getCoreController())],
+            'News.'. $command
+        );
+        if ($objectId > 0) {
+            $link .= '&id=' . $objectId;
+        }
+        return $this->uiFactory->link()->standard($label, $link);
     }
 }

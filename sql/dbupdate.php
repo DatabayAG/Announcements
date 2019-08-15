@@ -15,13 +15,13 @@ if (!$ilDB->tableExists('pl_announcements')) {
             'notnull'  => true,
             'default'  => 0
         ],
-        'last_modifier_usr_id' => [
+        'created_ts' => [
             'type'     => 'integer',
             'length'   => 4,
             'notnull'  => true,
             'default'  => 0
         ],
-        'created_ts' => [
+        'last_modifier_usr_id' => [
             'type'     => 'integer',
             'length'   => 4,
             'notnull'  => true,
@@ -36,14 +36,18 @@ if (!$ilDB->tableExists('pl_announcements')) {
         'publish_ts' => [
             'type'     => 'integer',
             'length'   => 4,
-            'notnull'  => true,
-            'default'  => 0
+        ],
+        'publish_timezone' => [
+            'type'     => 'text',
+            'length'   => 100,
         ],
         'expiration_ts' => [
             'type'     => 'integer',
             'length'   => 4,
-            'notnull'  => true,
-            'default'  => 0
+        ],
+        'expiration_timezone' => [
+            'type'     => 'text',
+            'length'   => 100,
         ],
         'title' => [
             'type'    => 'text',
@@ -54,96 +58,20 @@ if (!$ilDB->tableExists('pl_announcements')) {
             'type'    => 'clob',
             'notnull' => true
         ],
+        'category' => [
+            'type'    => 'integer',
+            'length'  => 4,
+            'notnull' => true,
+            'default' => 0
+        ],
+        'fixed' => [
+            'type'    => 'integer',
+            'length'  => 1,
+            'notnull' => true,
+            'default' => 0
+        ],
     ]);
     $ilDB->addPrimaryKey('pl_announcements', ['id']);
     $ilDB->createSequence('pl_announcements');
-}
-?>
-<#2>
-<?php
-if ($ilDB->tableExists('pl_announcements')) {
-    if (!$ilDB->tableColumnExists('pl_announcements', 'publish_datetime')) {
-        $ilDB->addTableColumn(
-            'pl_announcements',
-            'publish_datetime',
-            [
-                'type'    => 'timestamp',
-                'notnull' => true,
-            ]
-        );
-    }
-
-    if (!$ilDB->tableColumnExists('pl_announcements', 'publish_timezone')) {
-        $ilDB->addTableColumn(
-            'pl_announcements',
-            'publish_timezone',
-            [
-                'type'    => 'text',
-                'notnull' => true,
-                'length' => 100,
-            ]
-        );
-    }
-}
-?>
-<#3>
-<?php
-if ($ilDB->tableExists('pl_announcements')) {
-    if (!$ilDB->tableColumnExists('pl_announcements', 'expiration_datetime')) {
-        $ilDB->addTableColumn(
-            'pl_announcements',
-            'expiration_datetime',
-            [
-                'type'    => 'timestamp',
-                'notnull' => true,
-            ]
-        );
-    }
-
-    if (!$ilDB->tableColumnExists('pl_announcements', 'expiration_timezone')) {
-        $ilDB->addTableColumn(
-            'pl_announcements',
-            'expiration_timezone',
-            [
-                'type'    => 'text',
-                'notnull' => true,
-                'length' => 100,
-            ]
-        );
-    }
-}
-?>
-<#4>
-<?php
-if ($ilDB->tableExists('pl_announcements')) {
-    if (!$ilDB->tableColumnExists('pl_announcements', 'is_room_change')) {
-        $ilDB->addTableColumn(
-            'pl_announcements',
-            'is_room_change',
-            [
-                'type'    => 'integer',
-                'length'    => 1,
-                'notnull' => true,
-                'default' => 0
-            ]
-        );
-    }
-}
-?>
-<#5>
-<?php
-if ($ilDB->tableExists('pl_announcements')) {
-    if (!$ilDB->tableColumnExists('pl_announcements', 'is_sticky')) {
-        $ilDB->addTableColumn(
-            'pl_announcements',
-            'is_sticky',
-            [
-                'type'    => 'integer',
-                'length'    => 1,
-                'notnull' => true,
-                'default' => 0
-            ]
-        );
-    }
 }
 ?>

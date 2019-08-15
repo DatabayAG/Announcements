@@ -5,6 +5,7 @@ namespace ILIAS\Plugin\Announcements\Entry;
 
 use ILIAS\Plugin\Announcements\AccessControl\AccessHandler;
 use ILIAS\Plugin\Announcements\AccessControl\Exception\PermissionDenied;
+use ILIAS\Plugin\Announcements\AccessControl\Exception\PermissionRestricted;
 use ILIAS\Plugin\Announcements\Entry\Exception\NotFound;
 use ILIAS\Plugin\Announcements\Entry\Exception\CommandLogic;
 
@@ -57,6 +58,7 @@ class Service
     /**
      * @param Model $entry
      * @throws PermissionDenied
+     * @throws PermissionRestricted
      * @throws CommandLogic
      */
     public function createEntry(Model $entry)
@@ -69,6 +71,16 @@ class Service
             throw new CommandLogic('An entry with id cannot be created!');
         }
 
+        if (!$this->accessHandler->mayMakeTemporaryUnlimitedEntries()){
+            if(
+                $entry->getPublishTs() <= $entry->getExpirationTs() &&
+                $entry->getPublishTs() + (60*60*24*21) >= $entry->getExpirationTs()
+            ) {
+                throw new PermissionRestricted('Invalid date range!');
+            }
+            $entry->setFixed(0);
+        }
+
         $entry->setCreatedTs(time());
         $entry->setCreatorUsrId($this->actor->getId());
 
@@ -78,8 +90,10 @@ class Service
     /**
      * @param Model $entry
      * @throws PermissionDenied
+     * @throws PermissionRestricted
      * @throws CommandLogic
      * @throws NotFound
+     * @throws \arException
      */
     public function modifyEntry(Model $entry)
     {
@@ -89,6 +103,24 @@ class Service
 
         if (!$entry->getId()) {
             throw new CommandLogic('An entry without id cannot be modified!');
+        }
+
+        if (!$this->accessHandler->mayMakeTemporaryUnlimitedEntries()){
+            $x = $entry->getPublishTs();
+            $y = $entry->getExpirationTs();
+            $z = $entry->getPublishTs() + (60*60*24*21);
+            if(
+                $entry->getPublishTs() >= $entry->getExpirationTs() ||
+                $entry->getPublishTs() + (60*60*24*21) <= $entry->getExpirationTs()
+            ) {
+                throw new PermissionRestricted('Invalid date range!');
+            }
+            //Avoids ActiveRecord Cache
+            $old = $this->db->query(
+                'SELECT * FROM ' . $entry::returnDbTableName() .
+                ' WHERE id = ' . $this->db->quote($entry->getId(),'integer')
+            )->fetch();
+            $entry->setFixed($old['fixed']);
         }
 
         try {
@@ -209,21 +241,23 @@ class Service
 
         if (!$this->accessHandler->mayReadUnpublishedEntries()) {
             $runtimeConditions[] = '(' . implode(' OR ', [
-                'publish_ts >= ' . $this->db->quote(time(), 'integer'),
+                'publish_ts = ' . $this->db->quote(0, 'integer'),
+                'publish_ts <= ' . $this->db->quote(time(), 'integer'),
                 'creator_usr_id = ' . $this->db->quote($this->actor->getId(), 'integer'),
             ]) . ')';
         }
 
         if (!$this->accessHandler->mayReadExpiredEntries()) {
             $runtimeConditions[] = '(' . implode(' OR ', [
-                'expiration_ts <= ' . $this->db->quote(time(), 'integer'),
+                'expiration_ts = ' . $this->db->quote(0, 'integer'),
+                'expiration_ts >= ' . $this->db->quote(time(), 'integer'),
                 'creator_usr_id = ' . $this->db->quote($this->actor->getId(), 'integer'),
             ]) . ')';
         }
 
         if ($onlyRoomChangeRelated) {
             $runtimeConditions[] = '(' . implode(' OR ', [
-                'is_room_change <= ' . $this->db->quote(1, 'integer'),
+                'category = ' . $this->db->quote(1, 'integer'),
             ]) . ')';
         }
 
@@ -231,8 +265,21 @@ class Service
             $effectiveCondition = implode(' AND ', $runtimeConditions);
         }
 
-        $list = Model::where($effectiveCondition)->orderBy('publish_ts', 'DESC');
+        $list = Model::where($effectiveCondition)->orderBy('fixed', 'DESC')->orderBy('publish_ts', 'DESC');
 
         return $list->get();
     }
+
+    /**
+     * @param int $id
+     * @return \ActiveRecord
+     */
+    public function findById(int $id) : \ActiveRecord
+    {
+
+        $list = Model::where('id = '.$this->db->quote($id, 'integer'));
+
+        return $list->first();
+    }
+
 }

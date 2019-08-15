@@ -141,6 +141,19 @@ class RoleBased implements AccessHandler
     }
 
     /**
+     * @inheritDoc
+     */
+    public function mayMakeTemporaryUnlimitedEntries() : bool
+    {
+        return count(
+            array_intersect(
+                $this->settings->getAclRoleToGlobalRoleMappings()['manager'],
+                $this->assignedGlobalRoles
+            )
+        ) > 0;
+    }
+
+    /**
      * @param string $resource
      * @param string $privilege
      * @return bool

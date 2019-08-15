@@ -15,3 +15,24 @@ rss_subscription_room_change_title#:#RSS-Feed für Raumänderungen abonnieren
 rss_subscription_room_change_info#:#Verwenden Sie die folgende Adresse, um den RSS-Feed zu abonnieren. Sie können diese Adresse kopieren und in einem beliebigen RSS-Client nutzen.
 label_rss_url#:#RSS-URL
 label_rss_room_change_url#:#RSS-URL
+create_news#:#Neuigkeit erstellen
+create_news#:#Neuigkeit bearbeiten
+news_title_info#:#Angezeigter Titel
+news_content_info#:#Details die beim aktivieren angezeigt werden
+publish_date#:#Veröffentlichungsdatum
+news_publish_date_info#:#Datum ab dem die Ankündigung gezeigt wird
+expiration_date#:#Verfallsdatum
+news_expiration_date_info#:#Datum ab dem die Ankündigung nicht mehr gezeigt wird
+fixed#:#Oben halten
+news_fixed_info#:#Diese Nachrichten sollten über allen anderen Nachrichten bleiben
+category#:#Kategorie
+news_category_info#:#Einordung in einen bestimmten Kontext
+room_change#:#Raumänderung
+form_msg_invalid_date_range#:#Ungültige Laufzeit. Maximal 21 Tage
+news_delete#:#Ankündigung löschen
+news_delete_q#:#Sind sie sicher, dass sie die Ankündigung löschen wollen?
+news#:#Ankündigungen
+news_empty#:#Keine Ankündigungen verfügbar
+saved_successfully#:#Ankündigung gespeichert
+deleted_successfully#:#Ankündigung gelöscht
+insufficient_permission#:#Unzureichende Berechtigung

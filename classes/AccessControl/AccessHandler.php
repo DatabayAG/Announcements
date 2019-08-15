@@ -40,6 +40,9 @@ interface AccessHandler
     public function mayMakeStickyEntries() : bool;
 
     /** @return bool */
+    public function mayMakeTemporaryUnlimitedEntries(): bool;
+
+    /** @return bool */
     public function mayReadExpiredEntries() : bool;
 
     /** @return bool */

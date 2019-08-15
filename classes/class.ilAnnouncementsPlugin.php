@@ -64,10 +64,10 @@ class ilAnnouncementsPlugin extends ilUserInterfaceHookPlugin
             $GLOBALS['DIC']['plugin.announcements.accessHandler'] = function (Container $c) {
                 return new Cached(
                     new RoleBased(
-                        $c->user(),
-                        $c['plugin.announcements.settings'],
-                        $c->rbac()->review(),
-                        $c['plugin.announcements.acl']
+                    $c->user(),
+                    $c['plugin.announcements.settings'],
+                    $c->rbac()->review(),
+                    $c['plugin.announcements.acl']
                     )
                 );
             };
