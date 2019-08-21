@@ -77,6 +77,8 @@ class NewsGUI extends \ilPropertyFormGUI
         $input->setInfo($this->translate('news_publish_date_info'));
         if ($model && $model->getPublishTs()) {
             $input->setDate(new \ilDateTime($model->getPublishTs(), IL_CAL_UNIX, $this->user->getTimeZone()));
+        } elseif (!$model) {
+            $input->setDate(new \ilDateTime(time(), IL_CAL_UNIX));
         }
         if (!$unlimitedDateRange) {
             $input->setRequired(true);
