@@ -49,19 +49,40 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
         $listTemplate->setVariable('TITLE', $plugin->txt('news'));
         $listTemplate->setVariable('RSS_COMPONENT',
             $this->uiRenderer->render(
-                $this->getRssSubscriptionModalTriggerComponents('', 'getRssModalContent')
+                $this->getRssSubscriptionModalTriggerComponents(
+                    $this->uiRenderer->render(
+                        $this->uiFactory->image()->standard(
+                            "./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/Announcements/templates/images/rss_1.svg",
+                            ''
+                        )
+                    )
+                    , 'getRssModalContent')
             )
         );
         $listTemplate->setVariable(
             'RSS_ROOM_CHANGE_COMPONENT',
             $this->uiRenderer->render(
-                $this->getRssSubscriptionModalTriggerComponents('', 'getRssRoomChangeModalContent')
+                $this->getRssSubscriptionModalTriggerComponents(
+                    $this->uiRenderer->render(
+                        $this->uiFactory->image()->standard(
+                            "./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/Announcements/templates/images/rss_2.svg",
+                            ''
+                        )
+                    )
+                    , 'getRssRoomChangeModalContent')
             )
         );
         if ($this->accessHandler->mayCreateEntries()) {
             $listTemplate->setVariable('CREATE_NEWS',
                 $this->uiRenderer->render(
-                    $this->getNewsCommandLink('', 'create')
+                    $this->getNewsCommandLink(
+                        $this->uiRenderer->render(
+                            $this->uiFactory->image()->standard(
+                                "./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/Announcements/templates/images/plus.svg",
+                                ''
+                            )
+                        )
+                        , 'create')
                 )
             );
         }
@@ -87,7 +108,14 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
                 $edit = '';
                 if ($this->accessHandler->mayEditEntry($object)) {
                     $edit = $this->uiRenderer->render(
-                        $this->getNewsCommandLink('', 'update', $object->getId())
+                        $this->getNewsCommandLink(
+                            $this->uiRenderer->render(
+                                $this->uiFactory->image()->standard(
+                                    "./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/Announcements/templates/images/pen.svg",
+                                    ''
+                                )
+                            )
+                        , 'update', $object->getId())
                     );
                 }
                 $delete = '';
@@ -103,13 +131,20 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
                             ) . '&id=' . $object->getId()
                         );
                     $deleteBtn =
-                    $deleteBtn = $this->uiFactory->button()->shy('', '#')->withOnClick($deleteModal->getShowSignal());
-                    $delete = $this->uiRenderer->render([$deleteModal, $deleteBtn]);
+                    $deleteBtn = $this->uiFactory->button()->shy(
+                        $this->uiRenderer->render(
+                            $this->uiFactory->image()->standard(
+                                "./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/Announcements/templates/images/trash.svg",
+                                ''
+                            )
+                        )
+                        , '#')->withOnClick($deleteModal->getShowSignal());
+                    $delete =  $this->uiRenderer->render([$deleteModal, $deleteBtn]);
                 }
 
                 $header = $plugin->getTemplate('tpl.announcement_header.html', true, true);
                 $header->setVariable('TITLE', $object->getTitle());
-                $header->setVariable('ACTIONS', $delete . $edit);
+                $header->setVariable('ACTIONS', $edit . $delete);
                 $header->setVariable(
                     'META_INFOS',
                     preg_replace('/^\[([^\s]*)\]$/', '$1', $names[$object->getCreatorUsrId()]) . ' | ' . $published
