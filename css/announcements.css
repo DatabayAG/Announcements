@@ -3,11 +3,14 @@
     padding: 1em;
 }
 .announcements_layer img{
+    vertical-align: -webkit-baseline-middle;
+}
+
+.announcements_layer a,
+.announcements_layer button{
     width: 20px;
     height: 20px;
-}
-.announcements_layer .modal + button{
-    height: 20px;
+    border: none;
 }
 .announcements_layer .announcement-title{
     color:#932136;
@@ -19,8 +22,11 @@
     background-color: #e5e5e5;
     display: flex;
 }
+.announcements_layer .il_VAccordionHead a{
+     line-height: 100%;
+}
 .announcements_layer .il_VAccordionHead * + *{
-    margin-left: 1em;
+    margin-left: .5em;
 }
 .announcements_layer .il_VAccordionHead .announcement-meta{
     color: #8d8d8d;
