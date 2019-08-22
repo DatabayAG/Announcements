@@ -40,6 +40,7 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
         }
 
         $plugin = $this->getCoreController()->getPluginObject();
+
         $this->mainTemlate->addCss($plugin->getDirectory() . '/css/announcements.css');
         $this->mainTemlate->addJavaScript($plugin->getDirectory() . '/js/announcements.js');
 

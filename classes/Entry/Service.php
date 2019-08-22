@@ -71,10 +71,10 @@ class Service
             throw new CommandLogic('An entry with id cannot be created!');
         }
 
-        if (!$this->accessHandler->mayMakeTemporaryUnlimitedEntries()){
-            if(
+        if (!$this->accessHandler->mayMakeTemporaryUnlimitedEntries()) {
+            if (
                 $entry->getPublishTs() <= $entry->getExpirationTs() &&
-                $entry->getPublishTs() + (60*60*24*21) >= $entry->getExpirationTs()
+                $entry->getPublishTs() + (60 * 60 * 24 * 21) <= $entry->getExpirationTs()
             ) {
                 throw new PermissionRestricted('Invalid date range!');
             }
@@ -106,16 +106,13 @@ class Service
         }
 
         if (!$this->accessHandler->mayMakeTemporaryUnlimitedEntries()){
-            $x = $entry->getPublishTs();
-            $y = $entry->getExpirationTs();
-            $z = $entry->getPublishTs() + (60*60*24*21);
-            if(
+            if (
                 $entry->getPublishTs() >= $entry->getExpirationTs() ||
-                $entry->getPublishTs() + (60*60*24*21) <= $entry->getExpirationTs()
+                $entry->getPublishTs() + (60 * 60 * 24 * 21) <= $entry->getExpirationTs()
             ) {
                 throw new PermissionRestricted('Invalid date range!');
             }
-            //Avoids ActiveRecord Cache
+
             $old = $this->db->query(
                 'SELECT * FROM ' . $entry::returnDbTableName() .
                 ' WHERE id = ' . $this->db->quote($entry->getId(),'integer')
@@ -272,11 +269,10 @@ class Service
 
     /**
      * @param int $id
-     * @return \ActiveRecord
+     * @return Model
      */
-    public function findById(int $id) : \ActiveRecord
+    public function findById(int $id) : Model
     {
-
         $list = Model::where('id = '.$this->db->quote($id, 'integer'));
 
         return $list->first();

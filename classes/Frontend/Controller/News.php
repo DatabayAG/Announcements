@@ -1,5 +1,6 @@
 <?php declare(strict_types=1);
 /* Copyright (c) 1998-2019 ILIAS open source, Extended GPL, see docs/LICENSE */
+
 namespace ILIAS\Plugin\Announcements\Frontend\Controller;
 
 use ILIAS\Plugin\Announcements\AccessControl\Exception\PermissionDenied;
@@ -15,16 +16,11 @@ use ILIAS\Plugin\Announcements\Frontend\Controller\GUI\NewsGUI;
  */
 class News extends Base
 {
-
-    /**
-     * @var NewsGUI
-     */
+    /** @var NewsGUI */
     protected $gui;
 
-    /**
-     * @var string
-     */
-    protected $action;
+    /** @var string */
+    protected $action = '';
 
     /**
      * @inheritDoc
@@ -32,7 +28,8 @@ class News extends Base
     protected function init()
     {
         if (!$this->accessHandler->mayReadEntries()) {
-            throw new PermissionDenied('No permission to read entries!');
+            \ilUtil::sendFailure($this->lng->txt('permission_denied'), true);
+            $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI');
         }
 
         $this->gui = new NewsGUI($this->coreController->getPluginObject());
@@ -58,6 +55,11 @@ class News extends Base
      */
     public function createCmd() : string
     {
+        if (!$this->accessHandler->mayCreateEntries()) {
+            \ilUtil::sendFailure($this->lng->txt('permission_denied'), true);
+            $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI');
+        }
+        
         return $this->gui->initForm(
             $this->accessHandler->mayMakeTemporaryUnlimitedEntries(),
             $this->action
@@ -72,6 +74,11 @@ class News extends Base
     {
         $id = (int) ($this->request->getQueryParams()['id'] ?? 0);
         $model = $this->service->findById($id);
+
+        if (!$this->accessHandler->mayEditEntry($model)) {
+            \ilUtil::sendFailure($this->lng->txt('permission_denied'), true);
+            $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI');
+        }
 
         return $this->gui->initForm(
             $this->accessHandler->mayMakeTemporaryUnlimitedEntries(),
@@ -88,12 +95,14 @@ class News extends Base
         $id = (int) ($this->request->getQueryParams()['id'] ?? 0);
         $model = $this->service->findById($id);
 
-        try {
-            $this->service->deleteEntry($model);
-        } catch (PermissionDenied $e) {
-            $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI&failed=1');
+        if (!$this->accessHandler->mayDeleteEntry($model)) {
+            \ilUtil::sendFailure($this->lng->txt('permission_denied'), true);
+            $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI');
         }
-        \ilUtil::sendSuccess($this->coreController->getPluginObject()->txt('deleted_successfully'),true);
+
+        $this->service->deleteEntry($model);
+
+        \ilUtil::sendSuccess($this->coreController->getPluginObject()->txt('deleted_successfully'), true);
         $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI&deleted=1');
     }
 
@@ -109,20 +118,30 @@ class News extends Base
 
         if ($this->request->getParsedBody()['id']) {
             $model = $this->service->findById((int) $this->request->getParsedBody()['id']);
+
+            if (!$this->accessHandler->mayEditEntry($model)) {
+                \ilUtil::sendFailure($this->lng->txt('permission_denied'), true);
+                $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI');
+            }
+
             $form = $this->gui->initForm(
                 $this->accessHandler->mayMakeTemporaryUnlimitedEntries(),
                 $this->action, $model
             );
         } else {
+            if (!$this->accessHandler->mayCreateEntries()) {
+                \ilUtil::sendFailure($this->lng->txt('permission_denied'), true);
+                $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI');
+            }
+
             $model = new Model();
             $form = $this->gui->initForm(
                 $this->accessHandler->mayMakeTemporaryUnlimitedEntries(),
                 $this->action
             );
         }
+
         if ($form->checkInput()) {
-
-
             try {
                 $model->setTitle($form->getInput('title'));
                 $model->setContent($form->getInput('content'));
@@ -145,37 +164,22 @@ class News extends Base
                     } else {
                         $this->service->createEntry($model);
                     }
-                    \ilUtil::sendSuccess($this->coreController->getPluginObject()->txt('saved_successfully'),true);
+
+                    \ilUtil::sendSuccess($this->coreController->getPluginObject()->txt('saved_successfully'), true);
                     $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI');
-                } catch(PermissionRestricted $e) {
+                } catch (PermissionRestricted $e) {
                     $item = $form->getItemByPostVar('expiration_date');
                     $item->setAlert($this->coreController->getPluginObject()->txt('form_msg_invalid_date_range'));
-                } catch(PermissionDenied $e) {
-                    \ilUtil::sendFailure($this->coreController->getPluginObject()->txt('insufficient_permission'),true);
-                    $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI');
                 }
-
             } catch (Exception $e) {
                 $content[] = $this->uiFactory->messageBox()->failure($this->lng->txt('form_input_not_valid'));
             }
         }
 
+        $form->setValuesByPost();
+
         $content[] = $this->uiFactory->legacy($form->getHtml());
 
         return $this->uiRenderer->render($content);
-    }
-
-    /**
-     * @param Model $model
-     * @return bool
-     */
-    private function checkDateLimitation(Model $model) : bool
-    {
-        if (!$this->accessHandler->mayMakeTemporaryUnlimitedEntries()) {
-            return
-                ($model->getPublishTs() <= $model->getExpirationTs()) &&
-                ($model->getPublishTs() + (60*60*24*21) >= $model->getExpirationTs());
-        }
-        return true;
     }
 }

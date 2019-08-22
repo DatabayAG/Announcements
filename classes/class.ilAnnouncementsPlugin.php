@@ -101,17 +101,12 @@ class ilAnnouncementsPlugin extends ilUserInterfaceHookPlugin
                     ->allow('creator', 'list', 'readUnpublished')
                     ->allow('creator', 'list', 'readExpired')
                     ->allow('creator', 'entry', 'create')
-                    ->allow('creator', 'entry', 'modify')
-                    ->allow('creator', 'entry', 'delete')
                     ->allow('manager', 'list', 'read')
                     ->allow('manager', 'list', 'readUnpublished')
                     ->allow('manager', 'list', 'readExpired')
                     ->allow('manager', 'entry', 'create')
                     ->allow('manager', 'entry', 'modify')
                     ->allow('manager', 'entry', 'delete')
-                    ->allow('manager', 'entry', 'createUnlimited')
-                    ->allow('manager', 'entry', 'modifyUnlimited')
-                    ->allow('manager', 'entry', 'deleteUnlimited')
                     ->allow('manager', 'entry', 'makeSticky');
 
                 return $acl;
