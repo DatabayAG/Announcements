@@ -20,34 +20,51 @@ abstract class Base implements ViewModifier
 {
     /** @var ServerRequestInterface */
     protected $request;
+
     /** @var \ilTemplate */
     protected $tpl;
+
     /** @var Factory */
     protected $uiFactory;
+
     /** @var \ilCtrl */
     protected $ctrl;
+
     /** @var Renderer */
     protected $uiRenderer;
+
     /** @var Container */
     protected $dic;
+
     /** @var \ilToolbarGUI */
     protected $toolbar;
+
     /** @var \ilObjuser */
     protected $user;
+
     /** @var Service */
     protected $service;
+
     /** @var AccessHandler */
     protected $accessHandler;
+
     /** @var \ilAccessHandler */
     protected $coreAccessHandler;
+
     /** @var \ilErrorHandling */
     protected $errorHandler;
+
     /** @var \ilLanguage */
     protected $lng;
+
     /** @var \ilAnnouncementsUIHookGUI */
     public $coreController;
+
     /** @var \ilTemplate */
-    protected $mainTemlate;
+    protected $mainTemplate;
+
+    /** @var \ilTemplate */
+    protected $keyValueStore;
 
     /**
      * Base constructor.
@@ -60,7 +77,7 @@ abstract class Base implements ViewModifier
         $this->dic = $dic;
 
         $this->request = $dic->http()->request();
-        $this->mainTemlate = $dic->ui()->mainTemplate();
+        $this->mainTemplate = $dic->ui()->mainTemplate();
         $this->ctrl = $dic->ctrl();
         $this->lng = $dic->language();
         $this->tpl = $dic->ui()->mainTemplate();
@@ -69,6 +86,7 @@ abstract class Base implements ViewModifier
         $this->uiFactory = $dic->ui()->factory();
         $this->service = $dic['plugin.announcements.service'];
         $this->accessHandler = $dic['plugin.announcements.accessHandler'];
+        $this->keyValueStore = $dic['plugin.announcements.kvstore'];
         $this->coreAccessHandler = $dic->access();
         $this->errorHandler = $dic['ilErr'];
     }

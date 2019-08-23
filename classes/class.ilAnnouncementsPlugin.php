@@ -11,6 +11,7 @@ use ILIAS\Plugin\Announcements\AccessControl\Handler\Cached;
 use ILIAS\Plugin\Announcements\AccessControl\Handler\RoleBased;
 use ILIAS\Plugin\Announcements\Administration\GeneralSettings\Settings;
 use ILIAS\Plugin\Announcements\Entry\Service;
+use ILIAS\Plugin\Announcements\Storage\KeyValue\Session;
 
 /**
  * Class ilAnnouncementsPlugin
@@ -61,13 +62,17 @@ class ilAnnouncementsPlugin extends ilUserInterfaceHookPlugin
         if (!self::$initialized) {
             self::$initialized = true;
 
+            $GLOBALS['DIC']['plugin.announcements.kvstore'] = function (Container $c) {
+                return new Session($this->getId());
+            };
+
             $GLOBALS['DIC']['plugin.announcements.accessHandler'] = function (Container $c) {
                 return new Cached(
                     new RoleBased(
-                    $c->user(),
-                    $c['plugin.announcements.settings'],
-                    $c->rbac()->review(),
-                    $c['plugin.announcements.acl']
+                        $c->user(),
+                        $c['plugin.announcements.settings'],
+                        $c->rbac()->review(),
+                        $c['plugin.announcements.acl']
                     )
                 );
             };
@@ -203,7 +208,7 @@ class ilAnnouncementsPlugin extends ilUserInterfaceHookPlugin
     protected function beforeUninstall()
     {
         global $DIC;
-        
+
         if ($DIC->database()->tableExists('pl_announcements')) {
             $DIC->database()->dropTable('pl_announcements');
         }
