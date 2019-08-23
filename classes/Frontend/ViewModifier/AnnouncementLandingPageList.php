@@ -121,7 +121,12 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
         $announcementList->limit((int) $pageIndex * (int) $pageSize, (int) $pageSize);
 
         $announcements = $announcementList->get();
+
         if (empty($announcements)) {
+            if ((int) $pageIndex > 0) {
+                $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI&apage=0');
+            }
+
             $listTemplate->setVariable(
                 'NEWS_EMPTY',
                 $this->uiRenderer->render($this->uiFactory->messageBox()->info($plugin->txt('news_empty')))
