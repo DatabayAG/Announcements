@@ -1,0 +1,66 @@
+.announcements-layer {
+  background: white;
+  padding: 1em;
+
+  img {
+    vertical-align: -webkit-baseline-middle;
+  }
+
+  .announcement-title {
+    color: #932136;
+    font-weight: 700;
+    width: 100%;
+  }
+
+  .announcements-head {
+    color: #932136;
+    padding: 1em 0;
+    font-weight: 600;
+    display: flex;
+
+    a, button {
+      width: 20px;
+      height: 20px;
+      border: none;
+    }
+
+    .btn-link {
+      margin-right: 1em;
+    }
+  }
+
+  .announcements {
+    a, button {
+      width: 20px;
+      height: 20px;
+      border: none;
+    }
+
+    .announcements_accordion {
+      .il_VAccordionHead {
+        background-color: #e5e5e5;
+        display: flex;
+
+        a {
+          line-height: 100%;
+        }
+
+        * + * {
+          margin-left: .5em;
+        }
+
+        .announcement-meta {
+          color: #8d8d8d;
+          font-weight: normal;
+          font-size: small;
+          white-space: nowrap;
+        }
+      }
+
+      .il_VAccordionContent {
+        padding: 1em;
+        border: 3px solid #e5e5e5;
+      }
+    }
+  }
+}

@@ -1,50 +1,54 @@
-.announcements_layer{
-    background: white;
-    padding: 1em;
+.announcements-layer {
+  background: white;
+  padding: 1em;
 }
-.announcements_layer img{
-    vertical-align: -webkit-baseline-middle;
+.announcements-layer img {
+  vertical-align: -webkit-baseline-middle;
 }
-
-.announcements_layer a,
-.announcements_layer button{
-    width: 20px;
-    height: 20px;
-    border: none;
+.announcements-layer .announcement-title {
+  color: #932136;
+  font-weight: 700;
+  width: 100%;
 }
-.announcements_layer .announcement-title{
-    color:#932136;
-    font-weight: 700;
-    width: 100%;
+.announcements-layer .announcements-head {
+  color: #932136;
+  padding: 1em 0;
+  font-weight: 600;
+  display: flex;
 }
-
-.announcements_layer .il_VAccordionHead{
-    background-color: #e5e5e5;
-    display: flex;
+.announcements-layer .announcements-head a,
+.announcements-layer .announcements-head button {
+  width: 20px;
+  height: 20px;
+  border: none;
 }
-.announcements_layer .il_VAccordionHead a{
-     line-height: 100%;
+.announcements-layer .announcements-head .btn-link {
+  margin-right: 1em;
 }
-.announcements_layer .il_VAccordionHead * + *{
-    margin-left: .5em;
+.announcements-layer .announcements a,
+.announcements-layer .announcements button {
+  width: 20px;
+  height: 20px;
+  border: none;
 }
-.announcements_layer .il_VAccordionHead .announcement-meta{
-    color: #8d8d8d;
-    font-weight: normal;
-    font-size: small;
-    white-space: nowrap;
+.announcements-layer .announcements .announcements_accordion .il_VAccordionHead {
+  background-color: #e5e5e5;
+  display: flex;
 }
-.announcements_accordion .il_VAccordionContent{
-    padding: 1em;
-    border: 3px solid #e5e5e5;
+.announcements-layer .announcements .announcements_accordion .il_VAccordionHead a {
+  line-height: 100%;
 }
-
-.announcements_layer .announcements_head{
-    color:#932136;
-    padding: 1em 0;
-    font-weight: 600;
-    display: flex;
+.announcements-layer .announcements .announcements_accordion .il_VAccordionHead * + * {
+  margin-left: .5em;
 }
-.announcements_layer .announcements_head .btn-link{
-    margin-right: 1em;
+.announcements-layer .announcements .announcements_accordion .il_VAccordionHead .announcement-meta {
+  color: #8d8d8d;
+  font-weight: normal;
+  font-size: small;
+  white-space: nowrap;
 }
+.announcements-layer .announcements .announcements_accordion .il_VAccordionContent {
+  padding: 1em;
+  border: 3px solid #e5e5e5;
+}
+/*# sourceMappingURL=announcements.css.map */
