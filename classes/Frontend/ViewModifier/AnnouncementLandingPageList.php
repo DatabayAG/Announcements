@@ -27,22 +27,39 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
     }
 
     /**
+     * @return int
+     */
+    private function getPageIndex() : int
+    {
+        $pageIndex = 0;
+        if (isset($this->request->getQueryParams()['apage'])) {
+            $pageIndex = max((int) $this->request->getQueryParams()['apage'], $pageIndex);
+            $this->keyValueStore->set('announcement_page', $pageIndex);
+        }
+
+        return $this->keyValueStore->get('announcement_page', 0);
+    }
+
+    /**
      * @inheritDoc
      * @throws \arException
      * @throws \ilDateTimeException
      */
     public function modifyHtml(string $component, string $part, array $parameters) : array
     {
+        $pageSize = 2; // TODO
+        $pageIndex = $this->getPageIndex();
+
         try {
-            $announcements = $this->service->findAllValid();
+            $announcementList = $this->service->findAllValid(false);
         } catch (PermissionDenied $e) {
             return [];
         }
 
         $plugin = $this->getCoreController()->getPluginObject();
 
-        $this->mainTemlate->addCss($plugin->getDirectory() . '/css/announcements.css');
-        $this->mainTemlate->addJavaScript($plugin->getDirectory() . '/js/announcements.js');
+        $this->mainTemplate->addCss($plugin->getDirectory() . '/css/announcements.css');
+        $this->mainTemplate->addJavaScript($plugin->getDirectory() . '/js/announcements.js');
 
         $listTemplate = $plugin->getTemplate('tpl.landing_page_list.html', true, true);
 
@@ -87,13 +104,31 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
             );
         }
 
-        $acc = new \ilAccordionGUI();
+        $numberOfAnnouncements = $announcementList->count();
+        if ($numberOfAnnouncements > $pageSize) {
+            $listTemplate->setVariable('PAGINATION', $this->uiRenderer->render(
+                $this->uiFactory
+                    ->viewControl()
+                    ->pagination()
+                    ->withTargetURL('ilias.php?baseClass=ilPersonalDesktopGUI', 'apage')
+                    ->withTotalEntries($numberOfAnnouncements)
+                    ->withPageSize($pageSize)
+                    ->withMaxPaginationButtons(10)
+                    ->withCurrentPage($pageIndex)
+            ));
+        }
+        
+        $announcementList->limit((int) $pageIndex * (int) $pageSize, (int) $pageSize);
+
+        $announcements = $announcementList->get();
         if (empty($announcements)) {
             $listTemplate->setVariable(
                 'NEWS_EMPTY',
                 $this->uiRenderer->render($this->uiFactory->messageBox()->info($plugin->txt('news_empty')))
             );
         } else {
+            $acc = new \ilAccordionGUI();
+
             $usrIds = array_map(
                 function ($announcement) {
                     return $announcement->getCreatorUsrId();
@@ -101,10 +136,12 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
                 $announcements
             );
             $names = \ilUserUtil::getNamePresentation($usrIds);
+
             foreach ($announcements as $object) {
                 $published = \ilDatePresentation::formatDate(
                     new \ilDateTime($object->getPublishTs(), IL_CAL_UNIX, $this->user->getTimeZone())
                 );
+
                 $edit = '';
                 if ($this->accessHandler->mayEditEntry($object)) {
                     $edit = $this->uiRenderer->render(
@@ -118,6 +155,7 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
                         , 'update', $object->getId())
                     );
                 }
+
                 $delete = '';
                 if ($this->accessHandler->mayDeleteEntry($object)) {
                     $deleteModal = $this->uiFactory
@@ -152,10 +190,12 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
 
                 $acc->addItem($header->get(), \ilUtil::makeClickable(nl2br($object->getContent())));
             }
-            $listTemplate->setVariable('NEWS_ENTRY', $acc->getHTML());
 
+            $listTemplate->setVariable('NEWS_ENTRY', $acc->getHTML());
         }
+        
         $listTemplate->parseCurrentBlock();
+
         $content[] = $this->uiFactory->legacy($listTemplate->get());
 
         return ['mode' => \ilUIHookPluginGUI::PREPEND, 'html' => $this->uiRenderer->render($content)];

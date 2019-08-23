@@ -114,7 +114,7 @@ class Handler implements RequestHandlerInterface
             isset($request->getQueryParams()['room_change_related'])
         );
 
-        foreach ($entries as $entry) {
+        foreach ($entries->get() as $entry) {
             $rssTemplate->setCurrentBlock('item');
             $rssTemplate->setVariable('ITEM_TITLE', $this->entities($entry->getTitle()));
             $rssTemplate->setVariable('ITEM_DESCRIPTION', $this->entities($entry->getContent()));

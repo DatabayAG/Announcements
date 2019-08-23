@@ -103,7 +103,7 @@ class Session implements KeyValue
             return $default;
         }
 
-        if ($this->getTime() >= $session[$key]['expires_at'] === false) {
+        if ($this->getTime() >= $session[$key]['expires_at']) {
             return $default;
         }
 

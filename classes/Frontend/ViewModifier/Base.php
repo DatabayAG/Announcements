@@ -7,6 +7,7 @@ use ILIAS\DI\Container;
 use ILIAS\Plugin\Announcements\AccessControl\AccessHandler;
 use ILIAS\Plugin\Announcements\Entry\Service;
 use ILIAS\Plugin\Announcements\Frontend\ViewModifier;
+use ILIAS\Plugin\Announcements\Storage\KeyValue;
 use ILIAS\UI\Factory;
 use ILIAS\UI\Renderer;
 use Psr\Http\Message\ServerRequestInterface;
@@ -63,7 +64,7 @@ abstract class Base implements ViewModifier
     /** @var \ilTemplate */
     protected $mainTemplate;
 
-    /** @var \ilTemplate */
+    /** @var KeyValue */
     protected $keyValueStore;
 
     /**

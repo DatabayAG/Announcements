@@ -223,11 +223,11 @@ class Service
 
     /**
      * @param bool $onlyRoomChangeRelated
-     * @return Model[]
+     * @return \ActiveRecordList
      * @throws PermissionDenied
      * @throws \arException
      */
-    public function findAllValid($onlyRoomChangeRelated = false) : array
+    public function findAllValid($onlyRoomChangeRelated = false) : \ActiveRecordList
     {
         if (!$this->accessHandler->mayReadEntries()) {
             throw new PermissionDenied('No permission to read entries!');
@@ -264,7 +264,7 @@ class Service
 
         $list = Model::where($effectiveCondition)->orderBy('fixed', 'DESC')->orderBy('publish_ts', 'DESC');
 
-        return $list->get();
+        return $list;
     }
 
     /**
