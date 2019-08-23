@@ -47,7 +47,7 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
      */
     public function modifyHtml(string $component, string $part, array $parameters) : array
     {
-        $pageSize = 2; // TODO
+        $pageSize = 10;
         $pageIndex = $this->getPageIndex();
 
         try {
