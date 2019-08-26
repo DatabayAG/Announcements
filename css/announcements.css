@@ -5,6 +5,14 @@
 .announcements-layer img {
   vertical-align: -webkit-baseline-middle;
 }
+.announcements-layer a,
+.announcements-layer button {
+  width: 20px;
+  /* for display: flex */
+  min-width: 20px;
+  height: 20px;
+  border: none;
+}
 .announcements-layer .announcement-title {
   color: #932136;
   font-weight: 700;
@@ -16,20 +24,8 @@
   font-weight: 600;
   display: flex;
 }
-.announcements-layer .announcements-head a,
-.announcements-layer .announcements-head button {
-  width: 20px;
-  height: 20px;
-  border: none;
-}
 .announcements-layer .announcements-head .btn-link {
   margin-right: 1em;
-}
-.announcements-layer .announcements a,
-.announcements-layer .announcements button {
-  width: 20px;
-  height: 20px;
-  border: none;
 }
 .announcements-layer .announcements .announcements_accordion .il_VAccordionHead {
   background-color: #e5e5e5;
@@ -51,4 +47,3 @@
   padding: 1em;
   border: 3px solid #e5e5e5;
 }
-/*# sourceMappingURL=announcements.css.map */

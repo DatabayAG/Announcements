@@ -6,6 +6,14 @@
     vertical-align: -webkit-baseline-middle;
   }
 
+  a, button {
+    width: 20px;
+    /* for display: flex */
+    min-width: 20px;
+    height: 20px;
+    border: none;
+  }
+
   .announcement-title {
     color: #932136;
     font-weight: 700;
@@ -18,23 +26,12 @@
     font-weight: 600;
     display: flex;
 
-    a, button {
-      width: 20px;
-      height: 20px;
-      border: none;
-    }
-
     .btn-link {
       margin-right: 1em;
     }
   }
 
   .announcements {
-    a, button {
-      width: 20px;
-      height: 20px;
-      border: none;
-    }
 
     .announcements_accordion {
       .il_VAccordionHead {
