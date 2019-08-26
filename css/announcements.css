@@ -2,21 +2,19 @@
   background: white;
   padding: 1em;
 }
-.announcements-layer img {
-  vertical-align: -webkit-baseline-middle;
-}
 .announcements-layer a,
 .announcements-layer button {
-  width: 20px;
+  width: 16px;
   /* for display: flex */
-  min-width: 20px;
-  height: 20px;
+  min-width: 16px;
+  height: 16px;
   border: none;
 }
 .announcements-layer .announcement-title {
   color: #932136;
   font-weight: 700;
   width: 100%;
+  overflow: hidden;
 }
 .announcements-layer .announcements-head {
   color: #932136;
@@ -42,6 +40,15 @@
   font-weight: normal;
   font-size: small;
   white-space: nowrap;
+}
+@media screen and (max-width: 768px) {
+  .announcements-layer .announcements .announcements_accordion .il_VAccordionHead {
+    flex-wrap: wrap;
+  }
+  .announcements-layer .announcements .announcements_accordion .il_VAccordionHead .announcement-meta {
+    min-width: calc(100% - 48px);
+    margin: 0;
+  }
 }
 .announcements-layer .announcements .announcements_accordion .il_VAccordionContent {
   padding: 1em;
