@@ -122,6 +122,8 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
 
         $announcements = $announcementList->get();
 
+        $componentsForOuterRendering = [];
+
         if (empty($announcements)) {
             if ((int) $pageIndex > 0) {
                 $this->ctrl->redirectToURL('ilias.php?baseClass=ilPersonalDesktopGUI&apage=0');
@@ -182,7 +184,9 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
                             )
                         )
                         , '#')->withOnClick($deleteModal->getShowSignal());
-                    $delete =  $this->uiRenderer->render([$deleteModal, $deleteBtn]);
+
+                    $delete =  $this->uiRenderer->render([$deleteBtn]);
+                    $componentsForOuterRendering[] = $deleteModal;
                 }
 
                 $header = $plugin->getTemplate('tpl.announcement_header.html', true, true);
@@ -199,7 +203,11 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
             $listTemplate->setVariable('NEWS_ENTRY', $acc->getHTML());
         }
         
-        $listTemplate->parseCurrentBlock();
+        foreach ($componentsForOuterRendering as $component) {
+            $listTemplate->setCurrentBlock('ui_components');
+            $listTemplate->setVariable('COMPONENT', $this->uiRenderer->render([$component]));
+            $listTemplate->parseCurrentBlock();
+        }
 
         $content[] = $this->uiFactory->legacy($listTemplate->get());
 
