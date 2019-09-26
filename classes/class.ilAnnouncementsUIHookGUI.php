@@ -111,15 +111,32 @@ class ilAnnouncementsUIHookGUI extends ilUIHookPluginGUI
         }
 
         if (isset($this->dic['tpl'])) {
-            if (null === self::$modifiers) {
-                self::$modifiers = [
-                    new AnnouncementLandingPageList($this, $this->dic)
-                ];
+            $phpSelf = (string) ($_SERVER['PHP_SELF'] ?? '');
+            $urlParts = parse_url($phpSelf);
+            $script = basename($phpSelf);
+
+            if (
+                null === self::$modifiers &&
+                in_array($script, ['login.php', 'goto.php', 'ilias.php']) &&
+                (
+                    0 === strlen($phpSelf) ||
+                    !is_array($urlParts) ||
+                    !isset($urlParts['path']) ||
+                    strpos($urlParts['path'], '/LiveVoting/') === false
+                )
+            ) {
+                if (null === self::$modifiers) {
+                    self::$modifiers = [
+                        new AnnouncementLandingPageList($this, $this->dic)
+                    ];
+                }
             }
 
-            foreach (self::$modifiers as $modifier) {
-                if ($modifier->shouldModifyHtml($a_comp, $a_part, $a_par)) {
-                    return $modifier->modifyHtml($a_comp, $a_part, $a_par);
+            if (is_array(self::$modifiers)) {
+                foreach (self::$modifiers as $modifier) {
+                    if ($modifier->shouldModifyHtml($a_comp, $a_part, $a_par)) {
+                        return $modifier->modifyHtml($a_comp, $a_part, $a_par);
+                    }
                 }
             }
         }
