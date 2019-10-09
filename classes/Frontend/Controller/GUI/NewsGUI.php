@@ -3,6 +3,7 @@
 namespace ILIAS\Plugin\Announcements\Frontend\Controller\GUI;
 
 use ILIAS\Plugin\Announcements\Entry\Model;
+use ILIAS\Plugin\Announcements\Entry\Purifier;
 
 /**
  * Class News
@@ -64,7 +65,12 @@ class NewsGUI extends \ilPropertyFormGUI
 
         $input = new \ilTextAreaInputGUI($this->translate('content'), 'content');
         $input->setRows(3);
-        $input->setCols(40);
+        $input->setUseRte(true);
+        $input->setRteTagSet('standard');
+        if (\ilObjAdvancedEditing::_getRichTextEditor()) {
+            $input->usePurifier(true);
+            $input->setPurifier(new Purifier());
+        }
         $input->setInfo($this->translate('news_content_info'));
         if ($model && $model->getContent()) {
             $input->setValue($model->getContent());

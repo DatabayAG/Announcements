@@ -197,7 +197,7 @@ class AnnouncementLandingPageList extends Base implements ViewModifier
                     preg_replace('/^\[([^\s]*)\]$/', '$1', $names[$object->getCreatorUsrId()]) . ' | ' . $published
                 );
 
-                $acc->addItem($header->get(), \ilUtil::makeClickable(nl2br($object->getContent())));
+                $acc->addItem($header->get(), \ilUtil::makeClickable($object->getContent()));
             }
 
             $listTemplate->setVariable('NEWS_ENTRY', $acc->getHTML());

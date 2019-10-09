@@ -117,7 +117,7 @@ class Handler implements RequestHandlerInterface
         foreach ($entries->get() as $entry) {
             $rssTemplate->setCurrentBlock('item');
             $rssTemplate->setVariable('ITEM_TITLE', $this->entities($entry->getTitle()));
-            $rssTemplate->setVariable('ITEM_DESCRIPTION', $this->entities($entry->getContent()));
+            $rssTemplate->setVariable('ITEM_DESCRIPTION', '<![CDATA[' . trim($entry->getContent()) .']]>');
             $rssTemplate->setVariable(
                 'ITEM_LINK',
                 $this->entities($this->adjustUrl(\ilLink::_getLink($entry->getId(), 'announcements')))
@@ -134,13 +134,13 @@ class Handler implements RequestHandlerInterface
             ));
             $rssTemplate->parseCurrentBlock();
         }
+        
+        $body = $rssTemplate->get();
 
         $response = $response
             ->withStatus(200)
             ->withHeader('Content-Type', 'text/xml; charset=UTF-8;')
-            ->withBody($stream = Streams::ofString(
-                $rssTemplate->get()
-            ));
+            ->withBody($stream = Streams::ofString($body));
 
         return $response;
     }
