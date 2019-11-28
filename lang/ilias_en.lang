@@ -23,7 +23,7 @@ publish_date#:#Publish Date
 news_publish_date_info#:#Date since the news is shown
 expiration_date#:#Expiration Date
 news_expiration_date_info#:#Date until the new is shown
-fixed#:Fixed on top
+fixed#:#Fixed on top
 news_fixed_info#:#This news should be fixed on top of all other news
 category#:#Category
 news_category_info#:#Context of the news
