@@ -8,7 +8,22 @@ in this document are to be interpreted as described in
 **Table of Contents**
 
 * [Install](#install)
+* [Examples](#examples)
 * [License](#license)
+
+## Examples
+
+### Announcements Personal Desktop
+
+![Personal Desktop](https://databayag.github.io/Announcements/0.0.5/overview.png)
+
+### Edit/Create entries
+
+![Edit/Create entries](https://databayag.github.io/Announcements/0.0.5/edit_create.png)
+
+### Configure view roles
+
+![Ćonfigure view roles](https://databayag.github.io/Announcements/0.0.5/roles.png)
 
 ## Install
 
