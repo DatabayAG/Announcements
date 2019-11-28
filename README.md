@@ -11,20 +11,6 @@ in this document are to be interpreted as described in
 * [Examples](#examples)
 * [License](#license)
 
-## Examples
-
-### Announcements Personal Desktop
-
-![Personal Desktop](https://databayag.github.io/Announcements/0.0.5/overview.png)
-
-### Edit/Create entries
-
-![Edit/Create entries](https://databayag.github.io/Announcements/0.0.5/edit_create.png)
-
-### Configure view roles
-
-![Ćonfigure view roles](https://databayag.github.io/Announcements/0.0.5/roles.png)
-
 ## Install
 
 This plugin MUST be installed as a
@@ -39,6 +25,20 @@ ensured by the responsible system administrator.
 
 The plugin's files and folder SHOULD NOT be created, 
 as root.
+
+## Examples
+
+### Announcements Personal Desktop
+
+![Personal Desktop](https://databayag.github.io/Announcements/0.0.5/overview.png)
+
+### Edit/Create entries
+
+![Edit/Create entries](https://databayag.github.io/Announcements/0.0.5/edit_create.png)
+
+### Configure view roles
+
+![Ćonfigure view roles](https://databayag.github.io/Announcements/0.0.5/roles.png)
 
 ## License
 
