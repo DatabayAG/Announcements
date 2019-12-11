@@ -6,7 +6,7 @@ adm_form_lbl_channel_desc_info#:#Hier können Sie die Beschreibung des RSS-Chann
 acl_role_reader#:#Ankündigungsleser
 acl_role_creator#:#Ankündigungsersteller
 acl_role_manager#:#Ankündigungsmanager
-acl_role_mapping_please_assign_groles#:#Bitte weisen Sie der Rolle ein oder mehrere globale ILIAS-Rollen zu.
+acl_role_mapping_please_assign_groles#:#Bitte weisen Sie der Rolle eine oder mehrere globale ILIAS-Rollen zu.
 rss_subscription_btn_label#:#RSS
 rss_subscription_room_change_btn_label#:#RSS Raumänderungen
 rss_subscription_info#:#RSS-Feed abonnieren
@@ -20,17 +20,17 @@ create_news#:#Neuigkeit erstellen
 create_news#:#Neuigkeit bearbeiten
 update_news#:#Neuigkeit editieren
 news_title_info#:#Angezeigter Titel
-news_content_info#:#Details die beim aktivieren angezeigt werden
+news_content_info#:#Details, die beim Aktivieren angezeigt werden.
 publish_date#:#Veröffentlichungsdatum
-news_publish_date_info#:#Datum ab dem die Ankündigung gezeigt wird
+news_publish_date_info#:#Datum, ab dem die Ankündigung gezeigt wird.
 expiration_date#:#Verfallsdatum
-news_expiration_date_info#:#Datum ab dem die Ankündigung nicht mehr gezeigt wird
+news_expiration_date_info#:#Datum, ab dem die Ankündigung nicht mehr gezeigt wird.
 fixed#:#Oben halten
-news_fixed_info#:#Diese Nachrichten sollten über allen anderen Nachrichten bleiben
+news_fixed_info#:#Diese Nachrichten sollen über allen anderen Nachrichten bleiben.
 category#:#Kategorie
-news_category_info#:#Einordung in einen bestimmten Kontext
+news_category_info#:#Einordung in einen bestimmten Kontext.
 room_change#:#Raumänderung
-form_msg_invalid_date_range#:#Ungültige Laufzeit. Maximal 21 Tage
+form_msg_invalid_date_range#:#Ungültige Laufzeit. Maximal 21 Tage.
 news_delete#:#Ankündigung löschen
 news_delete_q#:#Sind sie sicher, dass sie die Ankündigung löschen wollen?
 news#:#Ankündigungen
